@@ -1,0 +1,38 @@
+[
+  {
+    "_id": "6a1ae849e0d027fd51d1b01f",
+    "name": "Asus Tuf",
+    "image": "http://localhost:8000/uploads/brands/brands-1780152952683-917188120.jpeg",
+    "imagePath": "uploads\\brands\\brands-1780152952683-917188120.jpeg",
+    "createdAt": "2026-05-30T13:38:17.716Z",
+    "updatedAt": "2026-05-30T14:55:52.718Z",
+    "slug": "asus-tuf"
+  },
+  {
+    "_id": "6a0fc4e7b09a74bb6c4549cc",
+    "name": "Lenovo ThinkPad",
+    "createdAt": "2026-05-22T02:52:23.835Z",
+    "updatedAt": "2026-05-30T14:56:32.497Z",
+    "slug": "lenovo-thinkpad",
+    "image": "http://localhost:8000/uploads/brands/brands-1780152992466-442634248.jpeg",
+    "imagePath": "uploads\\brands\\brands-1780152992466-442634248.jpeg"
+  },
+  {
+    "_id": "69fa1c5e3bd981ce71a17399",
+    "name": "MacBook",
+    "slug": "macbook",
+    "createdAt": "2026-05-05T16:35:42.720Z",
+    "updatedAt": "2026-05-30T14:56:57.893Z",
+    "image": "http://localhost:8000/uploads/brands/brands-1780153017764-7133675.jpeg",
+    "imagePath": "uploads\\brands\\brands-1780153017764-7133675.jpeg"
+  },
+  {
+    "_id": "69fa1c473bd981ce71a17397",
+    "name": "Dell",
+    "slug": "dell",
+    "createdAt": "2026-05-05T16:35:19.989Z",
+    "updatedAt": "2026-05-30T14:57:32.656Z",
+    "image": "http://localhost:8000/uploads/brands/brands-1780153052634-582303787.jpeg",
+    "imagePath": "uploads\\brands\\brands-1780153052634-582303787.jpeg"
+  }
+]

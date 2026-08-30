@@ -1,0 +1,103 @@
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+
+import * as mongooseMiddleware from "../middlewares/mongoose-middleware.js";
+
+const UserSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 2,
+      maxlength: 50,
+    },
+    lastName: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 2,
+      maxlength: 50,
+    },
+    slug: { type: String, lowercase: true },
+    email: {
+      type: String,
+      lowercase: true,
+      trim: true,
+      required: true,
+      unique: true,
+    },
+    phone: String,
+    profileImage: String,
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      select: false,
+    },
+    passwordChangedAt: Date,
+    passwordResetCode: String,
+    passwordResetExpires: Date,
+    passwordResetVerified: Boolean,
+    refreshTokenHash: {
+      type: String,
+      select: false,
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+    active: {
+      type: Boolean,
+      default: true,
+    },
+    loggedOutAt: Date,
+  },
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform(doc, ret) {
+        delete ret.profileImage;
+        delete ret.password;
+        delete ret.passwordChangedAt;
+        delete ret.passwordResetCode;
+        delete ret.passwordResetExpires;
+        delete ret.passwordResetVerified;
+        delete ret.refreshTokenHash;
+        delete ret.loggedOutAt;
+        delete ret.__v;
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      transform(doc, ret) {
+        delete ret.profileImage;
+        delete ret.password;
+        delete ret.passwordChangedAt;
+        delete ret.passwordResetCode;
+        delete ret.passwordResetExpires;
+        delete ret.passwordResetVerified;
+        delete ret.refreshTokenHash;
+        delete ret.loggedOutAt;
+        delete ret.__v;
+        return ret;
+      },
+    },
+    id: false,
+  },
+);
+
+UserSchema.index({ phone: 1 }, { sparse: true });
+
+mongooseMiddleware.setImageUrl(UserSchema, "users", ["profileImage"]);
+
+UserSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, 12);
+  if (!this.isNew) this.passwordChangedAt = Date.now();
+});
+
+export default mongoose.model("User", UserSchema);
