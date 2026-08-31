@@ -106,17 +106,16 @@ export default class ApiFeatures {
   }
 
   buildPaginationResult(totalDocs) {
-    const page = this._page;
-    const limit = this._limit;
-    const skip = (page - 1) * limit;
+    const { _page: page, _limit: limit } = this;
 
     const paginationResult = {
-      limit,
-      countOfPages: Math.ceil(totalDocs / limit),
+      total: totalDocs,
+      countOfPages: Math.ceil(totalDocs / limit) || 0,
       page,
+      limit,
     };
 
-    if (skip > 0) paginationResult.prevPage = page - 1;
+    if (page > 1) paginationResult.prevPage = page - 1;
     if (page * limit < totalDocs) paginationResult.nextPage = page + 1;
 
     return paginationResult;

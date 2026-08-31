@@ -32,8 +32,8 @@ export const createReview = asyncHandler(async (req, res, next) => {
 
   const review = await reviewService.create(
     req.user._id,
-    verifiedFields,
     req.params.productId,
+    verifiedFields,
   );
 
   res.status(201).json({ status: "Success", data: review });
@@ -49,8 +49,8 @@ export const updateReview = asyncHandler(async (req, res, next) => {
 
   const review = await reviewService.update(
     req.user._id,
-    verifiedFields,
     req.params.id,
+    verifiedFields,
   );
 
   res.status(200).json({ status: "success", data: review });
