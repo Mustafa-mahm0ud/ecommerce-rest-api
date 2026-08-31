@@ -13,6 +13,7 @@ export const deleteImageFile = async (folderName, imageName) => {
     "..",
     "..",
     "..",
+    "..",
     "uploads",
     folderName,
     imageName,

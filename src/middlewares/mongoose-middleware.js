@@ -26,7 +26,7 @@ export const setImageUrl = (Schema, folderName, imageFields) => {
       if (Array.isArray(value))
         return value.map((img) => `${BASE_URL}/uploads/${folderName}/${img}`);
 
-      return `${BASE_URL}/uploads/${folderName}/${value}`;
+      return `${BASE_URL}/../uploads/${folderName}/${value}`;
     });
   });
 };
