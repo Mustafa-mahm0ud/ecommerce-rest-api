@@ -1,13 +1,13 @@
 import { param, body } from "express-validator";
 import validatorMiddleware from "../../middlewares/validator-middleware.js";
 
-const requiredOrOptional = (field, isUpdate, msg) =>
-  isUpdate
-    ? body(field).trim().optional()
-    : body(field).trim().notEmpty().withMessage(msg);
+const requiredOrOptional = (field, isRequired, msg) =>
+  isRequired
+    ? body(field).trim().notEmpty().withMessage(msg)
+    : body(field).trim().optional();
 
-const nameValidator = (isUpdate = false) =>
-  requiredOrOptional("name", isUpdate, "You must enter the name")
+const nameValidator = (isRequired = false) =>
+  requiredOrOptional("name", isRequired, "You must enter the name")
     .isLength({ min: 3, max: 32 })
     .withMessage("Category name must be between 3 and 32");
 
@@ -16,11 +16,14 @@ export const getCategoryValidator = [
   validatorMiddleware,
 ];
 
-export const createCategoryValidator = [nameValidator(), validatorMiddleware];
+export const createCategoryValidator = [
+  nameValidator(true),
+  validatorMiddleware,
+];
 
 export const updateCategoryValidator = [
   param("id").isMongoId().withMessage("Invalid category id format"),
-  nameValidator(true),
+  nameValidator(),
   validatorMiddleware,
 ];
 

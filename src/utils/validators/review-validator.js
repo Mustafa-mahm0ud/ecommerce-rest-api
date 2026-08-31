@@ -2,7 +2,9 @@ import { param, body } from "express-validator";
 import validatorMiddleware from "../../middlewares/validator-middleware.js";
 
 const requiredOrOptional = (field, isRequired, msg) =>
-  isRequired ? body(field).notEmpty().withMessage(msg) : body(field).optional();
+  isRequired
+    ? body(field).trim().notEmpty().withMessage(msg)
+    : body(field).trim().optional();
 
 const titleValidator = () =>
   body("title")
