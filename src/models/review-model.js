@@ -13,13 +13,13 @@ const ReviewSchema = new mongoose.Schema(
       max: 5,
     },
     user: {
-      type: mongoose.Schema.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
       immutable: true,
     },
     product: {
-      type: mongoose.Schema.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
       required: true,
       immutable: true,
