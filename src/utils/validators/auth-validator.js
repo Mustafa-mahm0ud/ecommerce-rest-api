@@ -3,6 +3,7 @@ import validatorMiddleware from "../../middlewares/validator-middleware.js";
 
 const emailValidator = () =>
   body("email")
+    .trim()
     .notEmpty()
     .withMessage("You must enter your email")
     .isEmail()
@@ -10,13 +11,13 @@ const emailValidator = () =>
 
 const passwordValidator = () =>
   body("password")
+    .trim()
     .notEmpty()
     .withMessage("Password is required")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters");
 
 export const registerValidator = [
-  emailValidator(),
   body("firstName")
     .trim()
     .notEmpty()
@@ -31,6 +32,7 @@ export const registerValidator = [
     .isLength({ min: 2, max: 50 })
     .withMessage("Last name must be between 2 and 50"),
 
+  emailValidator(),
   passwordValidator(),
 
   validatorMiddleware,
@@ -50,6 +52,7 @@ export const verifyResetCodeValidator = [
   emailValidator(),
 
   body("resetCode")
+    .trim()
     .notEmpty()
     .withMessage("Reset code is required")
     .isLength({ min: 6, max: 6 })
@@ -62,12 +65,14 @@ export const resetPasswordValidator = [
   emailValidator(),
 
   body("newPassword")
+    .trim()
     .notEmpty()
     .withMessage("New password is required")
     .isLength({ min: 6 })
     .withMessage("The password must be at least 6 characters long"),
 
   body("newPasswordConfirm")
+    .trim()
     .notEmpty()
     .withMessage("Password confirmation is required")
     .custom((val, { req }) => {

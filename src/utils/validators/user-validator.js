@@ -85,18 +85,21 @@ export const updateProfileValidator = [
 
 export const updateProfilePasswordValidator = [
   body("currentPassword")
+    .trim()
     .notEmpty()
     .withMessage("Current password required")
     .isLength({ min: 6 })
     .withMessage("The password must be at least 6 characters long"),
 
   body("newPassword")
+    .trim()
     .notEmpty()
     .withMessage("New password required")
     .isLength({ min: 6 })
     .withMessage("The New password must be at least 6 characters long"),
 
   body("newPasswordConfirm")
+    .trim()
     .notEmpty()
     .withMessage("password confirm required ")
     .custom((val, { req }) => {
