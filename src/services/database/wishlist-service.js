@@ -9,8 +9,7 @@ export const getDoc = async (userId) => {
       "title price slug imageCover discountPercentage priceAfterDiscount avgRatings ratingsCount",
   });
 
-  if (!wishlist)
-    throw new ApiError(`No wishlist found for this user ${userId}`, 404);
+  if (!wishlist) return { _id: null, user: userId, products: [] };
 
   return wishlist;
 };
@@ -24,11 +23,8 @@ export const addProduct = async (userId, productId) => {
   const wishlist = await wishlistModel.findOneAndUpdate(
     { user: userId },
     { $addToSet: { products: productId } },
-    { returnDocument: "after", runValidators: true },
+    { returnDocument: "after", runValidators: true, upsert: true },
   );
-
-  if (!wishlist)
-    throw new ApiError(`No wishlist found for this user ${userId}`, 404);
 
   return wishlist;
 };
@@ -44,10 +40,7 @@ export const removeProduct = async (userId, productId) => {
   );
 
   if (!wishlist)
-    throw new ApiError(
-      `Wishlist not found for this user, or product ${productId} is not in it`,
-      404,
-    );
+    throw new ApiError(`Product '${productId}' not found in wishlist`, 404);
 
   return wishlist;
 };
