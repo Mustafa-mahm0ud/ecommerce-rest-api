@@ -59,12 +59,12 @@ ReviewSchema.statics.calcRatings = async function (productId) {
   }
 };
 
-ReviewSchema.post("save", function () {
-  this.constructor.calcRatings(this.product);
+ReviewSchema.post("save", async function () {
+  await this.constructor.calcRatings(this.product);
 });
 
-ReviewSchema.post("findOneAndDelete", (doc) => {
-  if (doc) doc.constructor.calcRatings(doc.product);
+ReviewSchema.post("findOneAndDelete", async (doc) => {
+  if (doc) await doc.constructor.calcRatings(doc.product);
 });
 
 export default mongoose.model("Review", ReviewSchema);
