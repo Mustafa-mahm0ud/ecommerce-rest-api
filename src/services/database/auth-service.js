@@ -78,11 +78,7 @@ export const forgotPassword = async (email) => {
       "firstName passwordResetCode passwordResetExpires passwordResetVerified",
     );
 
-  if (!user)
-    throw new ApiError(
-      "If an account exists for this email, a reset code has been sent",
-      200,
-    );
+  if (!user) return;
 
   const { resetCode, hashedResetCode } = resolveResetCode();
 
@@ -99,10 +95,7 @@ export const forgotPassword = async (email) => {
       message: `Hi ${user.firstName},\n\nYour password reset code is: ${resetCode}\n\nThis code expires in 10 minutes. If you didn't request this, please ignore this email.`,
     });
   } catch (err) {
-    user.passwordResetCode = undefined;
-    user.passwordResetExpires = undefined;
-    user.passwordResetVerified = undefined;
-
+    clearPasswordResetFields(user);
     await user.save();
 
     throw new ApiError(
@@ -134,6 +127,9 @@ export const resetPassword = async (email, newPassword) => {
     throw new ApiError("Reset code not verified", 400);
 
   user.password = newPassword;
+  user.refreshTokenHash = undefined;
+  user.loggedOutAt = Date.now();
+
   clearPasswordResetFields(user);
   await user.save();
 
