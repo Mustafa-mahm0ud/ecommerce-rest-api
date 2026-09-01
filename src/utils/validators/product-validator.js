@@ -24,7 +24,7 @@ const descriptionValidator = (isRequired = false) =>
 
 const quantityValidator = (isRequired = false) =>
   requiredOrOptional("quantity", isRequired, "You must enter the quantity")
-    .isFloat({ min: 1 })
+    .isInt({ min: 1 })
     .withMessage("Product quantity must be at least one");
 
 const priceValidator = (isRequired = false) =>
@@ -39,8 +39,10 @@ const discountPercentageValidator = () =>
     .isFloat({ min: 0, max: 100 })
     .withMessage("Discount percentage must be between 0 and 100");
 
-const colorsValidator = () =>
-  body("colors").optional().isArray().withMessage("Colors must be an array");
+const colorsValidator = () => [
+  body("colors").optional().isArray().withMessage("colors must be an array"),
+  body("colors.*").isString().withMessage("each color must be a string"),
+];
 
 const imagesValidator = (isRequired = false) =>
   body("images")
@@ -67,11 +69,15 @@ const categoryValidator = (isRequired = false) =>
 const subCategoriesValidator = () =>
   body("subCategories")
     .optional()
-    .isArray()
-    .withMessage("SubCategories must be an array")
-    .custom((val, { req }) => {
-      const isValid = val.every((id) => mongoose.Types.ObjectId.isValid(id));
-      if (!isValid) throw new Error("Invalid subCategories ids format");
+    .isArray({ min: 1 })
+    .withMessage("subCategories must be a non-empty array")
+    .custom((ids) => {
+      const isValidIds = ids.every((id) => mongoose.Types.ObjectId.isValid(id));
+      if (!isValidIds) throw new Error("Invalid subCategories ids format");
+
+      const uniqueIds = new Set(ids);
+      if (uniqueIds.size !== ids.length)
+        throw new Error("Duplicate subCategories ids are not allowed");
 
       return true;
     });
@@ -91,7 +97,7 @@ export const createProductValidator = [
   quantityValidator(true),
   priceValidator(true),
   discountPercentageValidator(),
-  colorsValidator(),
+  ...colorsValidator(),
   imagesValidator(),
   categoryValidator(true),
   subCategoriesValidator(),
@@ -118,7 +124,7 @@ export const updateProductValidator = [
   quantityValidator(),
   priceValidator(),
   discountPercentageValidator(),
-  colorsValidator(),
+  ...colorsValidator(),
   categoryValidator(),
   subCategoriesValidator(),
   brandValidator(),

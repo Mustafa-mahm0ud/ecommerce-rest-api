@@ -3,16 +3,16 @@ import asyncHandler from "express-async-handler";
 import * as userService from "../services/database/user-service.js";
 import * as factory from "./crud-controller.js";
 
-const ALLOWED_USER_FIELDS = [
+const PROFILE_FIELDS = [
   "firstName",
   "lastName",
   "email",
   "phone",
   "profileImage",
   "password",
-  "role",
 ];
 
+const ADMIN_USER_FIELDS = [...PROFILE_FIELDS, "role"];
 /**
  *@desc        Get Users
  *@route       GET /api/v1/users
@@ -39,7 +39,7 @@ export const getProfile = factory.getDoc(userService, null, true);
  *@route       POST /api/v1/users
  *@access      Private (admin)
  */
-export const createUser = factory.create(ALLOWED_USER_FIELDS, userService);
+export const createUser = factory.create(ADMIN_USER_FIELDS, userService);
 
 /**
  *@desc        Update Specific User (Admin Action)
@@ -47,7 +47,7 @@ export const createUser = factory.create(ALLOWED_USER_FIELDS, userService);
  *@access      Private (admin)
  */
 export const updateUser = factory.update(
-  ALLOWED_USER_FIELDS,
+  PROFILE_FIELDS,
   userService,
   "profileImage",
   "users",
@@ -59,6 +59,7 @@ export const updateUser = factory.update(
  *@access      Private (protect)
  */
 export const updateProfile = factory.update(
+  PROFILE_FIELDS,
   userService,
   "profileImage",
   "users",

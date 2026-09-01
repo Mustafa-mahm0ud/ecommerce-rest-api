@@ -103,7 +103,7 @@ export const update = async (id, fieldsToUpdate, processedImage) => {
     await validateProductData(category, subCategories, oldProduct);
 
     if (price !== undefined || discountPercentage !== undefined) {
-      const productPrice = price || oldProduct.price;
+      const productPrice = price !== undefined ? price : oldProduct.price;
       const productDiscountPercentage =
         discountPercentage ?? oldProduct.discountPercentage;
 

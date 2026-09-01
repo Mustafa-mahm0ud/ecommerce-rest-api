@@ -48,7 +48,7 @@ export const createUserValidator = [
   body("password")
     .notEmpty()
     .withMessage("Password required")
-    .isLength({ min: 6 })
+    .isLength({ min: 8 })
     .withMessage("The password must be at least 6 characters long"),
 
   body("passwordConfirm")
@@ -88,14 +88,14 @@ export const updateProfilePasswordValidator = [
     .trim()
     .notEmpty()
     .withMessage("Current password required")
-    .isLength({ min: 6 })
+    .isLength({ min: 8 })
     .withMessage("The password must be at least 6 characters long"),
 
   body("newPassword")
     .trim()
     .notEmpty()
     .withMessage("New password required")
-    .isLength({ min: 6 })
+    .isLength({ min: 8 })
     .withMessage("The New password must be at least 6 characters long"),
 
   body("newPasswordConfirm")

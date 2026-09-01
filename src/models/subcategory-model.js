@@ -9,7 +9,6 @@ const SubCategorySchema = new mongoose.Schema(
       type: String,
       trim: true,
       required: true,
-      unique: true,
       minlength: 2,
       maxlength: 32,
     },
@@ -42,7 +41,7 @@ const SubCategorySchema = new mongoose.Schema(
     id: false,
   },
 );
-
+SubCategorySchema.index({ name: 1, category: 1 }, { unique: true });
 SubCategorySchema.index({ category: 1 });
 SubCategorySchema.index({ slug: 1 });
 

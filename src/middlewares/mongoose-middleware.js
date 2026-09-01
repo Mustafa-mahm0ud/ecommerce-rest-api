@@ -8,8 +8,16 @@ export const setSlugify = (Schema, sourceField) => {
 
   Schema.pre("findOneAndUpdate", async function () {
     const update = this.getUpdate();
-    const target = update.$set[sourceField];
-    if (target) update.slug = slugify(target, { lower: true });
+    const target = update.$set?.[sourceField] || update[sourceField];
+    if (!target) return;
+
+    const slug = slugify(target, { lower: true });
+
+    if (update.$set) {
+      update.$set.slug = slug;
+    } else {
+      update.slug = slug;
+    }
   });
 };
 
@@ -26,7 +34,7 @@ export const setImageUrl = (Schema, folderName, imageFields) => {
       if (Array.isArray(value))
         return value.map((img) => `${BASE_URL}/uploads/${folderName}/${img}`);
 
-      return `${BASE_URL}/../uploads/${folderName}/${value}`;
+      return `${BASE_URL}/uploads/${folderName}/${value}`;
     });
   });
 };
