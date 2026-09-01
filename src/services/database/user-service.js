@@ -30,15 +30,13 @@ export const changePassword = async (id, reqBody) => {
 
   if (!user) throw new ApiError(`No user found with id: ${id}`, 404);
 
-  const isCorrectPassword = await bcrypt.compare(
-    currentPassword,
-    user.password,
-  );
+  const correctPassword = await bcrypt.compare(currentPassword, user.password);
 
-  if (!isCorrectPassword)
-    throw new ApiError("Incorrect current password!", 400);
+  if (!correctPassword) throw new ApiError("Incorrect current password", 400);
 
   user.password = newPassword;
+  user.refreshTokenHash = undefined;
+  user.loggedOutAt = Date.now();
 
   await user.save();
 };
