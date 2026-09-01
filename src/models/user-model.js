@@ -27,7 +27,7 @@ const UserSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    phone: String,
+    phone: { type: String, unique: true, sparse: true },
     profileImage: String,
     password: {
       type: String,
@@ -89,8 +89,6 @@ const UserSchema = new mongoose.Schema(
     id: false,
   },
 );
-
-UserSchema.index({ phone: 1 }, { sparse: true });
 
 mongooseMiddleware.setImageUrl(UserSchema, "users", ["profileImage"]);
 
