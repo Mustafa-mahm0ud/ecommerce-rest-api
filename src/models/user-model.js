@@ -99,13 +99,12 @@ UserSchema.pre("save", async function () {
   if (!this.isNew) this.passwordChangedAt = Date.now();
 });
 
-UserSchema.pre("save", function (next) {
+UserSchema.pre("save", function () {
   this._wasNew = this.isNew;
-  next();
 });
 
 UserSchema.post("save", async (doc) => {
-  if (doc.wasNew) {
+  if (doc._wasNew) {
     try {
       await wishlistModel.create({ user: doc._id });
     } catch (err) {
