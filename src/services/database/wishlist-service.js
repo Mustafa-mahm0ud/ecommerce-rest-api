@@ -3,13 +3,41 @@ import productModel from "../../models/product-model.js";
 import ApiError from "../../utils/api-error.js";
 
 export const getDoc = async (userId) => {
-  const wishlist = await wishlistModel.findOne({ user: userId }).populate({
+  const wishlist = await wishlistModel.findOne({ user: userId });
+
+  if (!wishlist) return { _id: null, user: userId, products: [] };
+
+  const originalIds = [...wishlist.products];
+
+  await wishlist.populate({
     path: "products",
     select:
       "title price slug imageCover discountPercentage priceAfterDiscount avgRatings ratingsCount",
   });
 
-  if (!wishlist) return { _id: null, user: userId, products: [] };
+  const ghostIds = [];
+  wishlist.products = wishlist.products.filter((product, index) => {
+    if (product === null) {
+      ghostIds.push(originalIds[index]);
+      return false;
+    }
+    return true;
+  });
+
+  // fire and forget
+  if (ghostIds.length > 0) {
+    wishlistModel
+      .updateOne(
+        { _id: wishlist._id },
+        { $pull: { products: { $in: ghostIds } } },
+      )
+      .catch((err) =>
+        console.error(
+          `Failed to clean ghost products for wishlist ${wishlist._id}:`,
+          err,
+        ),
+      );
+  }
 
   return wishlist;
 };
