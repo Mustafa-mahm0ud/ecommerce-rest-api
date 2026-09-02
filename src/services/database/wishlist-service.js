@@ -69,6 +69,4 @@ export const removeProduct = async (userId, productId) => {
 
   if (!wishlist)
     throw new ApiError(`Product '${productId}' not found in wishlist`, 404);
-
-  return wishlist;
 };
