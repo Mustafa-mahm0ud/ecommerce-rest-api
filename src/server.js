@@ -25,7 +25,7 @@ app.use(helmet());
 app.use(cookieParser());
 app.set("query parser", "extended");
 app.use(sanitizeMiddleware);
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 const { NODE_ENV } = process.env;
 if (NODE_ENV === "development") {
