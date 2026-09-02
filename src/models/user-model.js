@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
+import wishlistModel from "./wishlist-model.js";
 import * as mongooseMiddleware from "../middlewares/mongoose-middleware.js";
 
 const UserSchema = new mongoose.Schema(
@@ -96,6 +97,21 @@ UserSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 12);
   if (!this.isNew) this.passwordChangedAt = Date.now();
+});
+
+UserSchema.pre("save", function (next) {
+  this._wasNew = this.isNew;
+  next();
+});
+
+UserSchema.post("save", async (doc) => {
+  if (doc.wasNew) {
+    try {
+      await wishlistModel.create({ user: doc._id });
+    } catch (err) {
+      console.error(`Failed to create wishlist for user ${doc._id}:`, err);
+    }
+  }
 });
 
 export default mongoose.model("User", UserSchema);
