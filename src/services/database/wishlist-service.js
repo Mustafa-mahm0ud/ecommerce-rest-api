@@ -13,6 +13,7 @@ export const getWishlist = async (userId) => {
     path: "products",
     select:
       "title price slug imageCover discountPercentage priceAfterDiscount avgRatings ratingsCount",
+    options: { retainNullValues: true },
   });
 
   const ghostIds = [];
@@ -51,7 +52,7 @@ export const addProduct = async (userId, productId) => {
   const wishlist = await wishlistModel.findOneAndUpdate(
     { user: userId },
     { $addToSet: { products: productId } },
-    { returnDocument: "after", runValidators: true, upsert: true },
+    { returnDocument: "after", upsert: true },
   );
 
   return wishlist;
