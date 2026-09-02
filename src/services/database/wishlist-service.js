@@ -2,7 +2,7 @@ import wishlistModel from "../../models/wishlist-model.js";
 import productModel from "../../models/product-model.js";
 import ApiError from "../../utils/api-error.js";
 
-export const getDoc = async (userId) => {
+export const getWishlist = async (userId) => {
   const wishlist = await wishlistModel.findOne({ user: userId });
 
   if (!wishlist) return { _id: null, user: userId, products: [] };
