@@ -50,7 +50,7 @@ ReviewSchema.statics.calcRatings = async function (productId) {
       avgRatings: stats[0].avgRatings,
       ratingsCount: stats[0].ratingsCount,
     });
-    console.log(stats[0].avgRatings);
+
   } else {
     await productModel.findByIdAndUpdate(productId, {
       avgRatings: undefined,
