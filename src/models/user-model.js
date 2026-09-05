@@ -103,14 +103,13 @@ UserSchema.pre("save", function () {
   this._wasNew = this.isNew;
 });
 
-UserSchema.post("save", async (doc) => {
+// fire and forget
+UserSchema.post("save", (doc) => {
   if (doc._wasNew) {
-    try {
-      await wishlistModel.create({ user: doc._id });
-    } catch (err) {
-      console.error(`Failed to create wishlist for user ${doc._id}:`, err);
-    }
+    wishlistModel.create({ user: doc._id }).catch((err) => {
+      console.error("Failed to create wishlist for user:", doc._id, err);
+    });
   }
-});
+})
 
 export default mongoose.model("User", UserSchema);
