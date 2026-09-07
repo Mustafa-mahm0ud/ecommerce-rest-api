@@ -28,10 +28,10 @@ export const getDoc = (service, populateOptions, getIdFromUser = false) =>
     res.status(200).json({ status: "success", data: doc });
   });
 
-export const create = (allowedFields, service) =>
+export const create = (fieldsToCreate, service) =>
   asyncHandler(async (req, res, next) => {
     const doc = await service.create(
-      pickAllowedFields(allowedFields, req.body),
+      pickAllowedFields(fieldsToCreate, req.body),
       req.processedImage,
       req.processedImages,
     );
@@ -40,7 +40,7 @@ export const create = (allowedFields, service) =>
   });
 
 export const update = (
-  allowedFields,
+  fieldsToUpdate,
   service,
   imageField,
   folderName,
@@ -53,7 +53,7 @@ export const update = (
 
     const doc = await service.update(
       id,
-      pickAllowedFields(allowedFields, req.body),
+      pickAllowedFields(fieldsToUpdate, req.body),
       req.processedImage,
     );
 
