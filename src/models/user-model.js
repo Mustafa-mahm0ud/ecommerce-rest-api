@@ -36,6 +36,17 @@ const UserSchema = new mongoose.Schema(
       minlength: 8,
       select: false,
     },
+    addresses: {
+      type: [
+        {
+          alias: String,
+          details: String,
+          city: String,
+          isDefault: { type: Boolean, default: false },
+        },
+      ],
+      default: [],
+    },
     passwordChangedAt: Date,
     passwordResetCode: String,
     passwordResetExpires: Date,

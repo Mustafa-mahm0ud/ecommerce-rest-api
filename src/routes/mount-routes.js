@@ -6,6 +6,7 @@ import brandRouter from "./brand-route.js";
 import productRouter from "./product-route.js";
 import { standaloneReviewRouter } from "./review-route.js";
 import wishlistRouter from "./wishlist-route.js";
+import addressRouter from "./address-route.js";
 
 const mountRoutes = (app) => {
   app.use("/api/v1/auth", authRouter);
@@ -16,6 +17,7 @@ const mountRoutes = (app) => {
   app.use("/api/v1/products", productRouter);
   app.use("/api/v1/reviews", standaloneReviewRouter);
   app.use("/api/v1/wishlist", wishlistRouter);
+  app.use("/api/v1/addresses", addressRouter);
 };
 
 export default mountRoutes;
