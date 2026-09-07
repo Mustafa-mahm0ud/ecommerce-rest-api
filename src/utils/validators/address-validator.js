@@ -24,6 +24,40 @@ const cityValidator = (isRequired = false) =>
     .isLength({ min: 2, max: 50 })
     .withMessage("City must be between 2 and 50 characters");
 
+const landmarkValidator = () =>
+  body("landmark")
+    .trim()
+    .optional()
+    .isLength({ min: 3, max: 100 })
+    .withMessage("Landmark must be between 3 and 100 characters");
+
+const recipientFirstNameValidator = (isRequired = false) =>
+  requiredOrOptional(
+    "recipientFirstName",
+    isRequired,
+    "You must enter the recipient's first name",
+  )
+    .isLength({ min: 2, max: 50 })
+    .withMessage("Recipient first name must be between 2 and 50 characters");
+
+const recipientLastNameValidator = (isRequired = false) =>
+  requiredOrOptional(
+    "recipientLastName",
+    isRequired,
+    "You must enter the recipient's last name",
+  )
+    .isLength({ min: 2, max: 50 })
+    .withMessage("Recipient last name must be between 2 and 50 characters");
+
+const phoneValidator = (isRequired = false) =>
+  requiredOrOptional(
+    "phone",
+    isRequired,
+    "You must enter the recipient's phone number",
+  )
+    .isMobilePhone(["ar-EG"])
+    .withMessage("Phone number must be a valid Egyptian mobile number");
+
 const addressIdParamValidator = () =>
   param("addressId").isMongoId().withMessage("Invalid address id format");
 
@@ -31,6 +65,10 @@ export const addAddressValidator = [
   aliasValidator(true),
   detailsValidator(true),
   cityValidator(true),
+  landmarkValidator(),
+  recipientFirstNameValidator(true),
+  recipientLastNameValidator(true),
+  phoneValidator(true),
 
   validatorMiddleware,
 ];
@@ -43,6 +81,10 @@ export const updateAddressValidator = [
   aliasValidator(),
   detailsValidator(),
   cityValidator(),
+  landmarkValidator(),
+  recipientFirstNameValidator(),
+  recipientLastNameValidator(),
+  phoneValidator(),
 
   validatorMiddleware,
 ];
