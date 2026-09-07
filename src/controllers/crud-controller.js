@@ -69,7 +69,7 @@ export const update = (
     });
   });
 
-export const del = (service, imageFields = null, folderName = null) =>
+export const del = (service, imageFields, folderName) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
