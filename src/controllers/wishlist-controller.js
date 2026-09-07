@@ -29,11 +29,11 @@ export const addProduct = asyncHandler(async (req, res, next) => {
 
 /**
  *@desc        Remove product from wishlist
- *@route       DELETE /api/v1/wishlist
+ *@route       DELETE /api/v1/wishlist/:productId
  *@access      protect
  */
 export const removeProduct = asyncHandler(async (req, res, next) => {
-  await wishlistService.removeProduct(req.user._id, req.body.productId);
+  await wishlistService.removeProduct(req.user._id, req.params.productId);
 
   res.status(204).send();
 });

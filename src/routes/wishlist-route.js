@@ -11,7 +11,10 @@ router.use(authMiddleware.protect);
 router
   .route("/")
   .get(wishlistController.getWishlist)
-  .post(wishlistValidator.addProductValidator, wishlistController.addProduct)
+  .post(wishlistValidator.addProductValidator, wishlistController.addProduct);
+
+router
+  .route("/:productId")
   .delete(
     wishlistValidator.removeProductValidator,
     wishlistController.removeProduct,
