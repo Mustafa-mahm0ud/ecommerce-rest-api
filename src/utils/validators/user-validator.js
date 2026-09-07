@@ -1,5 +1,8 @@
 import { param, body } from "express-validator";
+
 import validatorMiddleware from "../../middlewares/validator-middleware.js";
+import requireAtLeastOneField from "../require-at-least-one-field.js.js";
+import { PROFILE_FIELDS } from "../constants/user-fields.js";
 
 const requiredOrOptional = (field, isRequired, msg) =>
   isRequired
@@ -66,6 +69,8 @@ export const createUserValidator = [
 export const updateUserValidator = [
   param("id").isMongoId().withMessage("Invalid user id format"),
 
+  requireAtLeastOneField(PROFILE_FIELDS),
+
   firstNameValidator(),
   lastNameValidator(),
   emailValidator(),
@@ -75,6 +80,8 @@ export const updateUserValidator = [
 ];
 
 export const updateProfileValidator = [
+  requireAtLeastOneField(PROFILE_FIELDS),
+
   firstNameValidator(),
   lastNameValidator(),
   emailValidator(),

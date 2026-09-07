@@ -1,5 +1,8 @@
 import { param, body } from "express-validator";
+
 import validatorMiddleware from "../../middlewares/validator-middleware.js";
+import requireAtLeastOneField from "../require-at-least-one-field.js.js";
+import { ALLOWED_SUBCATEGORY_UPDATE_FIELDS } from "../constants/subcategory-fields.js";
 
 const requiredOrOptional = (field, isRequired, msg) =>
   isRequired
@@ -33,6 +36,8 @@ export const createSubCategoryValidator = [
 
 export const updateSubCategoryValidator = [
   param("id").isMongoId().withMessage("Invalid subcategory id format"),
+
+  requireAtLeastOneField(ALLOWED_SUBCATEGORY_UPDATE_FIELDS),
 
   nameValidator(),
 

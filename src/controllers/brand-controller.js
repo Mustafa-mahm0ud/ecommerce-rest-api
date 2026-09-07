@@ -1,7 +1,6 @@
 import * as factory from "./crud-controller.js";
 import * as brandService from "../services/database/brand-service.js";
-
-const ALLOWED_BRAND_FIELDS = ["name", "image"];
+import ALLOWED_BRAND_FIELDS from "../utils/constants/brand-fields.js";
 
 /**
  *@desc        Get Brands

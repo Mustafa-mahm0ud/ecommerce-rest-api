@@ -3,8 +3,7 @@ import asyncHandler from "express-async-handler";
 import pickAllowedFields from "../helpers/pick-allowed-fields.js";
 import * as factory from "./crud-controller.js";
 import * as reviewService from "../services/database/review-service.js";
-
-const ALLOWED_REVIEW_FIELDS = ["title", "rating"];
+import ALLOWED_REVIEW_FIELDS from "../utils/constants/review-fields.js";
 
 const populateOptions = { path: "user", select: "name profileImage" };
 

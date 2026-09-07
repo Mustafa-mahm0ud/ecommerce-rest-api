@@ -2,6 +2,8 @@ import { param, body } from "express-validator";
 import mongoose from "mongoose";
 
 import validatorMiddleware from "../../middlewares/validator-middleware.js";
+import requireAtLeastOneField from "../require-at-least-one-field.js.js";
+import { ALLOWED_PRODUCT_FIELDS } from "../constants/product-fields.js";
 
 const requiredOrOptional = (field, isRequired, msg) =>
   isRequired
@@ -118,6 +120,8 @@ export const createProductValidator = [
 
 export const updateProductValidator = [
   param("id").isMongoId().withMessage("Invalid product id format"),
+
+  requireAtLeastOneField(ALLOWED_PRODUCT_FIELDS),
 
   titleValidator(),
   descriptionValidator(),

@@ -1,7 +1,6 @@
 import * as factory from "./crud-controller.js";
 import * as categoryService from "../services/database/category-service.js";
-
-const ALLOWED_CATEGORY_FIELDS = ["name", "image"];
+import ALLOWED_CATEGORY_FIELDS from "../utils/constants/category-fields.js";
 
 /**
  *@desc        Get Categories

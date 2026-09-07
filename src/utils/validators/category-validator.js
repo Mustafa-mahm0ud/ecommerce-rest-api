@@ -1,5 +1,8 @@
 import { param, body } from "express-validator";
+
 import validatorMiddleware from "../../middlewares/validator-middleware.js";
+import requireAtLeastOneField from "../require-at-least-one-field.js.js";
+import ALLOWED_CATEGORY_FIELDS from "../constants/category-fields.js";
 
 const requiredOrOptional = (field, isRequired, msg) =>
   isRequired
@@ -13,21 +16,28 @@ const nameValidator = (isRequired = false) =>
 
 export const getCategoryValidator = [
   param("id").isMongoId().withMessage("Invalid category id format"),
+
   validatorMiddleware,
 ];
 
 export const createCategoryValidator = [
   nameValidator(true),
+
   validatorMiddleware,
 ];
 
 export const updateCategoryValidator = [
   param("id").isMongoId().withMessage("Invalid category id format"),
+
+  requireAtLeastOneField(ALLOWED_CATEGORY_FIELDS),
+
   nameValidator(),
+
   validatorMiddleware,
 ];
 
 export const deleteCategoryValidator = [
   param("id").isMongoId().withMessage("Invalid category id format"),
+
   validatorMiddleware,
 ];

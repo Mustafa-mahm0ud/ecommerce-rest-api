@@ -2,20 +2,10 @@ import asyncHandler from "express-async-handler";
 
 import * as factory from "./crud-controller.js";
 import * as productService from "../services/database/product-service.js";
-
-const ALLOWED_PRODUCT_FIELDS = [
-  "title",
-  "description",
-  "quantity",
-  "price",
-  "discountPercentage",
-  "imageCover",
-  "category",
-  "subCategories",
-  "brand",
-];
-
-const ALLOWED_PRODUCT_CREATE_FIELDS = [...ALLOWED_PRODUCT_FIELDS, "images"];
+import {
+  ALLOWED_PRODUCT_FIELDS,
+  ALLOWED_PRODUCT_CREATE_FIELDS,
+} from "../utils/constants/product-fields.js";
 
 const populateOptions = {
   path: "category brand subCategories",

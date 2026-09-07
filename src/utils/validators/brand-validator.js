@@ -1,6 +1,8 @@
 import { param, body } from "express-validator";
 
 import validatorMiddleware from "../../middlewares/validator-middleware.js";
+import requireAtLeastOneField from "../require-at-least-one-field.js.js";
+import ALLOWED_BRAND_FIELDS from "../constants/brand-fields.js";
 
 const requiredOrOptional = (field, isRequired, msg) =>
   isRequired
@@ -14,6 +16,7 @@ const nameValidator = (isRequired = false) =>
 
 export const getBrandValidator = [
   param("id").isMongoId().withMessage("Invalid brand id format"),
+
   validatorMiddleware,
 ];
 
@@ -22,11 +25,15 @@ export const createBrandValidator = [nameValidator(true), validatorMiddleware];
 export const updateBrandValidator = [
   param("id").isMongoId().withMessage("Invalid brand id format"),
 
+  requireAtLeastOneField(ALLOWED_BRAND_FIELDS),
+
   nameValidator(),
+
   validatorMiddleware,
 ];
 
 export const deleteBrandValidator = [
   param("id").isMongoId().withMessage("Invalid brand id format"),
+
   validatorMiddleware,
 ];

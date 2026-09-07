@@ -1,5 +1,8 @@
 import { param, body } from "express-validator";
+
 import validatorMiddleware from "../../middlewares/validator-middleware.js";
+import requireAtLeastOneField from "../require-at-least-one-field.js.js";
+import ALLOWED_REVIEW_FIELDS from "../constants/review-fields.js";
 
 const requiredOrOptional = (field, isRequired, msg) =>
   isRequired
@@ -42,6 +45,8 @@ export const createReviewValidator = [
 
 export const updateReviewValidator = [
   param("id").isMongoId().withMessage("Invalid review id"),
+
+  requireAtLeastOneField(ALLOWED_REVIEW_FIELDS),
 
   titleValidator(),
   ratingValidator(),
