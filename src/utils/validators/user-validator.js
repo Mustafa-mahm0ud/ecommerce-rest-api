@@ -28,7 +28,7 @@ const phoneValidator = () =>
   body("phone")
     .optional()
     .isMobilePhone(["ar-EG"])
-    .withMessage("Invalid phone number");
+    .withMessage("Phone number must be a valid Egyptian mobile number");
 
 const roleValidator = (isRequired) =>
   requiredOrOptional("role", isRequired, "Role is required")
