@@ -12,7 +12,7 @@
     "prod": "cross-env NODE_ENV=production node src/server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Mustafa",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
