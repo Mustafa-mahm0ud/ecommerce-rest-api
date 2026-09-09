@@ -7,6 +7,7 @@ const WishlistSchema = new mongoose.Schema(
       ref: "User",
       required: true,
       unique: true,
+      immutable: true,
     },
     products: [
       {
