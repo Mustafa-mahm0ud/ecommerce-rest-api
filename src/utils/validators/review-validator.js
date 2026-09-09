@@ -1,7 +1,7 @@
 import { param, body } from "express-validator";
 
 import validatorMiddleware from "../../middlewares/validator-middleware.js";
-import requireAtLeastOneField from "../require-at-least-one-field.js.js";
+import requireAtLeastOneField from "../require-at-least-one-field.js";
 import ALLOWED_REVIEW_FIELDS from "../constants/review-fields.js";
 
 const requiredOrOptional = (field, isRequired, msg) =>
