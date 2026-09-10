@@ -6,7 +6,6 @@ import writeProcessedFiles from "../storage/local-storage/write-processed-files.
 
 export const getById = factory.getById(subCategoryModel);
 export const getDoc = factory.getDoc(subCategoryModel);
-export const update = factory.update(subCategoryModel);
 export const del = factory.del(subCategoryModel);
 
 const assertCategoryExists = async (categoryId) => {
@@ -36,4 +35,19 @@ export const create = async (allowedFields, categoryId, processedImage) => {
   if (processedImage) await writeProcessedFiles([processedImage]);
 
   return subCategory;
+};
+
+export const update = async (
+  allowedFields,
+  subCategoryId,
+  categoryId,
+  processedImage,
+) => {
+  await assertCategoryExists(categoryId);
+
+  return factory.update(subCategoryModel)(
+    subCategoryId,
+    allowedFields,
+    processedImage,
+  );
 };
