@@ -5,7 +5,8 @@ import ApiError from "../../utils/api-error.js";
 export const getWishlist = async (userId) => {
   const wishlist = await wishlistModel.findOne({ user: userId });
 
-  if (!wishlist) return { _id: null, user: userId, products: [] };
+  if (!wishlist || !wishlist.products.length)
+    return { _id: wishlist?._id ?? null, user: userId, products: [] };
 
   const originalIds = [...wishlist.products];
 
@@ -39,6 +40,8 @@ export const getWishlist = async (userId) => {
         ),
       );
   }
+
+  wishlist.products.reverse();
 
   return wishlist;
 };
