@@ -63,7 +63,7 @@ export const removeAddress = async (userId, addressId) => {
 
   if (!doc) throw new ApiError(`No address found with id: ${addressId}`, 404);
 
-  // just keep it To provide query
+  // Just keep it to provide query
   if (doc.addresses[0].isDefault)
     throw new ApiError(
       "Please add a default address before clearing the current default address",
