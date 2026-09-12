@@ -30,7 +30,17 @@ const CouponSchema = new mongoose.Schema(
     },
     maxDiscount: {
       type: Number,
+      required: [
+        function () {
+          return this.discountType === "percentage";
+        },
+        "Max discount is required for percentage discounts",
+      ],
       min: [0, "Max discount can't be negative"],
+    },
+    startDate: {
+      type: Date,
+      default: Date.now,
     },
     minOrderValue: {
       type: Number,
@@ -50,6 +60,12 @@ const CouponSchema = new mongoose.Schema(
     expire: {
       type: Date,
       required: [true, "Coupon expiration date is required"],
+      validate: {
+        validator: function (value) {
+          return value > this.startDate;
+        },
+        message: "Expiration date must be after the start date",
+      },
     },
     isActive: {
       type: Boolean,
