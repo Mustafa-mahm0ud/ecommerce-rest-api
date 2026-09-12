@@ -4,7 +4,6 @@ export const PROFILE_FIELDS = [
   "email",
   "phone",
   "profileImage",
-  "password",
 ];
 
-export const ADMIN_FIELDS = [...PROFILE_FIELDS, "role"];
+export const ADMIN_FIELDS = [...PROFILE_FIELDS, "role", "password"];

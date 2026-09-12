@@ -8,7 +8,7 @@ const multerOptions = () => {
     if (file.mimetype.startsWith("image")) {
       cb(null, true);
     } else {
-      cb(new ApiError("Accept Image Only!!!", 400), false);
+      cb(new ApiError("Accept Image Only", 400), false);
     }
   };
 

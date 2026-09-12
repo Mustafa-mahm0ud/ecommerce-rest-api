@@ -68,8 +68,8 @@ export const resetPasswordValidator = [
     .trim()
     .notEmpty()
     .withMessage("New password is required")
-    .isLength({ min: 6 })
-    .withMessage("The password must be at least 6 characters long"),
+    .isLength({ min: 8 })
+    .withMessage("The password must be at least 8 characters long"),
 
   body("newPasswordConfirm")
     .trim()

@@ -52,12 +52,21 @@ export const createSubCategory = asyncHandler(async (req, res, next) => {
  *@route       PATCH /api/v1/subcategories/:id
  * @access      Private
  */
-export const updateSubCategory = factory.update(
-  ALLOWED_SUBCATEGORY_UPDATE_FIELDS,
-  subCategoryService,
-  "image",
-  "subcategories",
-);
+export const updateSubCategory = asyncHandler(async (req, res, next) => {
+  const verifiedFields = pickAllowedFields(
+    ALLOWED_SUBCATEGORY_UPDATE_FIELDS,
+    req.body,
+  );
+
+  const doc = await subCategoryService.update(
+    verifiedFields,
+    req.params.id,
+    req.body.category,
+    req.processedImage,
+  );
+
+  res.status(200).json({ status: "success", data: doc });
+});
 
 /**
  *@desc        Delete SubCategories

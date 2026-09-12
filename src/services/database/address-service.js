@@ -63,6 +63,7 @@ export const removeAddress = async (userId, addressId) => {
 
   if (!doc) throw new ApiError(`No address found with id: ${addressId}`, 404);
 
+  // Just keep it to provide query
   if (doc.addresses[0].isDefault)
     throw new ApiError(
       "Please add a default address before clearing the current default address",
@@ -89,30 +90,28 @@ export const removeAddress = async (userId, addressId) => {
 export const setDefaultAddress = async (userId, addressId) => {
   const addressObjectId = new mongoose.Types.ObjectId(addressId);
 
-  const doc = await userModel
-    .updateOne(
-      { _id: userId, "addresses._id": addressId },
-      [
-        {
-          $set: {
-            addresses: {
-              $map: {
-                input: "$addresses",
-                as: "addr",
-                in: {
-                  $mergeObjects: [
-                    "$$addr",
-                    { isDefault: { $eq: ["$$addr._id", addressObjectId] } },
-                  ],
-                },
+  const doc = await userModel.updateOne(
+    { _id: userId, "addresses._id": addressId },
+    [
+      {
+        $set: {
+          addresses: {
+            $map: {
+              input: "$addresses",
+              as: "addr",
+              in: {
+                $mergeObjects: [
+                  "$$addr",
+                  { isDefault: { $eq: ["$$addr._id", addressObjectId] } },
+                ],
               },
             },
           },
         },
-      ],
-      { updatePipeline: true },
-    )
-    .select("-_id addresses");
+      },
+    ],
+    { updatePipeline: true },
+  );
 
   if (doc.matchedCount === 0)
     throw new ApiError(`No address found with id: ${addressId}`, 404);
