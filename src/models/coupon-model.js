@@ -17,7 +17,7 @@ const CouponSchema = new mongoose.Schema(
     discountValue: {
       type: Number,
       required: [true, "Discount value is required"],
-      min: [0, "Discount value can't be negative"],
+      min: [1, "Discount value must be at least 1"],
       validate: {
         validator: function (value) {
           if (this.discountType === "percentage") {
@@ -36,7 +36,15 @@ const CouponSchema = new mongoose.Schema(
         },
         "Max discount is required for percentage discounts",
       ],
-      min: [0, "Max discount can't be negative"],
+      min: [1, "Max discount must be at least 1"],
+      validate: {
+        validator: function (value) {
+          if (this.discountType === "fixed" && value !== undefined)
+            return false;
+          return true;
+        },
+        message: "Max discount is not allowed for fixed discounts",
+      },
     },
     startDate: {
       type: Date,
