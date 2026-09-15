@@ -66,13 +66,9 @@ export const deleteProduct = factory.del(
 export const addProductImage = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
 
-  const doc = await productService.addImage(
-    id,
-    req.body.images,
-    req.processedImages,
-  );
+  await productService.addImage(id, req.body.images, req.processedImages);
 
-  res.status(200).json({ status: "success", data: doc });
+  res.status(204).send();
 });
 
 /**
