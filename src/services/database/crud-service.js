@@ -96,9 +96,13 @@ export const del = (Model) => async (id) => {
 };
 
 export const addImage = (Model) => async (id, newImages, processedImages) => {
+  const docExists = await Model.exists({ _id: id });
+
+  if (!docExists) throw new ApiError(`No document found with id: ${id}`, 404);
+
   const newImagesCount = newImages.length;
 
-  const doc = await Model.findOneAndUpdate(
+  const doc = await Model.updateOne(
     {
       _id: id,
       $expr: {
@@ -109,28 +113,31 @@ export const addImage = (Model) => async (id, newImages, processedImages) => {
     { returnDocument: "after" },
   );
 
-  if (!doc) throw new ApiError(`No document found with id: ${id}`, 404);
+  if (doc.matchedCount === 0)
+    throw new ApiError(
+      "Too many files uploaded. The total number of document images must not exceed five image",
+      400,
+    );
 
   if (processedImages) await writeProcessedFiles(processedImages);
-
-  return doc;
 };
 
 export const deleteImage =
   (Model) => async (id, fieldName, folderName, imageName) => {
-    const doc = await Model.findOneAndUpdate(
+    const docExists = await Model.exists({ _id: id });
+    if (!docExists) throw new ApiError(`No document found with id: ${id}`, 404);
+
+    const doc = await Model.updateOne(
       { _id: id, [fieldName]: imageName },
       { $pull: { [fieldName]: imageName } },
       { returnDocument: "after" },
     );
 
-    if (!doc)
+    if (doc.matchedCount === 0)
       throw new ApiError(
-        `Image "${imageName}" was not found for this id: ${id}`,
+        `Image "${imageName}" was not found for doc id: ${id}`,
         404,
       );
 
     deleteImageFile(folderName, imageName);
-
-    return doc;
   };
