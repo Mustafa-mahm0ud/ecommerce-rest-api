@@ -1,13 +1,21 @@
 import { param, body } from "express-validator";
 
-import validatorMiddleware from "../../middlewares/validator-middleware.js";
-import requireAtLeastOneField from "../require-at-least-one-field.js";
 import ALLOWED_COUPON_FIELDS from "../constants/coupon-fields.js";
+import requireAtLeastOneField from "../require-at-least-one-field.js";
+import requiredOrOptional from "../../helpers/required-or-optional.js";
+import validatorMiddleware from "../../middlewares/validator-middleware.js";
 
-const requiredOrOptional = (field, isRequired, msg) =>
-  isRequired
-    ? body(field).trim().notEmpty().withMessage(msg)
-    : body(field).trim().optional();
+const preventUpdateIfUsed =
+  (fieldName) =>
+  (_, { req }) => {
+    if (!req.currentCoupon) return true;
+
+    if (req.currentCoupon.usedBy.length)
+      throw new Error(
+        `The ${fieldName} cannot be modified because it has been used by users`,
+      );
+    return true;
+  };
 
 const codeValidator = (isRequired = false) =>
   requiredOrOptional("code", isRequired, "You must enter the coupon code")
@@ -20,6 +28,7 @@ const discountTypeValidator = (isRequired = false) =>
     isRequired,
     "You must enter the discount type",
   )
+    .custom(preventUpdateIfUsed("discount type"))
     .isIn(["percentage", "fixed"])
     .withMessage("Discount type must be either percentage or fixed");
 
@@ -29,14 +38,15 @@ const discountValueValidator = (isRequired = false) =>
     isRequired,
     "You must enter the discount value",
   )
+    .custom(preventUpdateIfUsed("discount value"))
     .isFloat({ min: 1 })
     .withMessage("Discount value must be at least 1")
     .toFloat()
     .custom((value, { req }) => {
       if (
-        (req.body.discountType ?? req.currentCoupon?.discountType) ===
+        (req.body.discountType || req.currentCoupon?.discountType) ===
           "percentage" &&
-        value > 100
+        (value || req.currentCoupon.discountValue) > 100
       ) {
         throw new Error("Percentage discount can't exceed 100");
       }
