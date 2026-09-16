@@ -1,13 +1,9 @@
 import { param, body } from "express-validator";
 
-import validatorMiddleware from "../../middlewares/validator-middleware.js";
-import requireAtLeastOneField from "../require-at-least-one-field.js";
 import ALLOWED_REVIEW_FIELDS from "../constants/review-fields.js";
-
-const requiredOrOptional = (field, isRequired, msg) =>
-  isRequired
-    ? body(field).trim().notEmpty().withMessage(msg)
-    : body(field).trim().optional();
+import requireAtLeastOneField from "../require-at-least-one-field.js";
+import requiredOrOptional from "../../helpers/required-or-optional.js";
+import validatorMiddleware from "../../middlewares/validator-middleware.js";
 
 const titleValidator = () =>
   body("title")
