@@ -1,8 +1,17 @@
+const forbiddenKeys = new Set(["__proto__", "constructor", "prototype"]);
+
 const sanitizeObject = (obj) => {
   if (obj === null || typeof obj !== "object") return obj;
 
   Object.keys(obj).forEach((key) => {
-    if (key.startsWith("$") || key.includes(".")) delete obj[key];
+    if (
+      key.startsWith("$") ||
+      key.includes(".") ||
+      forbiddenKeys.has(key)
+    ) {
+      delete obj[key];
+      return;
+    }
 
     sanitizeObject(obj[key]);
   });
@@ -12,8 +21,7 @@ const sanitizeObject = (obj) => {
 const stripEmptyObjects = (obj) => {
   if (obj === null || typeof obj !== "object") return obj;
 
-  Object.keys(obj).forEach((key) => {
-    const val = obj[key];
+  Object.entries(obj).forEach(([key, val]) => {
     if (val && typeof val === "object" && !Array.isArray(val)) {
       stripEmptyObjects(val);
       if (Object.keys(val).length === 0) delete obj[key];
