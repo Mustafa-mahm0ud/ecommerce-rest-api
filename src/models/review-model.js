@@ -45,12 +45,12 @@ ReviewSchema.statics.calcRatings = async function (productId) {
     },
   ]);
 
-  if (stats.length > 0) {
+  if (stats.length) {
+    const { avgRatings, ratingsCount } = stats[0];
     await productModel.findByIdAndUpdate(productId, {
-      avgRatings: stats[0].avgRatings,
-      ratingsCount: stats[0].ratingsCount,
+      avgRatings,
+      ratingsCount,
     });
-
   } else {
     await productModel.findByIdAndUpdate(productId, {
       avgRatings: undefined,
