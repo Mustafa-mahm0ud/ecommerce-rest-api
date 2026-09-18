@@ -6,6 +6,7 @@ import * as localUploadMiddleware from "../middlewares/local-upload-middleware.j
 import * as productController from "../controllers/product-controller.js";
 import * as productValidator from "../utils/validators/product-validator.js";
 import { nestedReviewRouter } from "./review-route.js";
+import attachCurrentProduct from "../middlewares/attach-current-product.js";
 
 const uploadCoverImage = multerUploadMiddleware.uploadSingleImage("imageCover");
 
@@ -60,6 +61,7 @@ router
     uploadCoverImage,
     productValidator.updateProductValidator,
     resizeCoverImage,
+    attachCurrentProduct,
     productController.updateProduct,
   )
   .delete(

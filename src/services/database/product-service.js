@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import productModel from "../../models/product-model.js";
 import Category from "../../models/category-model.js";
 import SubCategory from "../../models/subcategory-model.js";
@@ -18,46 +20,46 @@ export const deleteImage = factory.deleteImage(productModel);
 
 export const validateProductData = async (
   category,
-  subCategories,
-  oldProduct = null,
+  subCategoriesIds,
+  currentProduct,
 ) => {
   if (category) {
     const isCategoryExist = await Category.exists({ _id: category });
     if (!isCategoryExist) {
-      throw new ApiError(`There is no category for this id: ${category}`, 400);
+      throw new ApiError(`No category found with id: ${category}`, 400);
     }
   }
 
-  if (subCategories?.length > 0) {
-    const dbSubCategories = await SubCategory.find({
-      _id: { $in: subCategories },
-    }).select("category");
-
-    if (dbSubCategories.length !== subCategories.length) {
-      throw new ApiError(
-        "Some subCategories IDs don't exist in the database",
-        404,
-      );
-    }
-
-    const targetCategory = category || oldProduct?.category;
+  if (subCategoriesIds?.length > 0) {
+    const targetCategory = category || currentProduct?.category;
 
     if (!targetCategory) {
       throw new ApiError("Product must belong to a parent category", 400);
     }
 
-    const isCategoryMatch = dbSubCategories.every(
-      (subCat) => subCat.category.toString() === targetCategory.toString(),
-    );
+    const [{ count = 0 } = {}] = await SubCategory.aggregate([
+      {
+        $match: {
+          _id: {
+            $in: subCategoriesIds.map(
+              (subCategoryId) => new mongoose.Types.ObjectId(subCategoryId),
+            ),
+          },
+          category: new mongoose.Types.ObjectId(targetCategory),
+        },
+      },
+      { $count: "count" },
+    ]);
 
-    if (!isCategoryMatch) {
+    if (count !== subCategoriesIds.length) {
       throw new ApiError(
-        `Some SubCategories don't belong to this category: ${targetCategory}`,
+        `Some subCategories don't exist or don't belong to this category: ${targetCategory}`,
         400,
       );
     }
   }
 };
+
 export const create = async (
   fieldsToCreate,
   processedImage,
@@ -71,6 +73,9 @@ export const create = async (
     discountPercentage,
   );
 
+  if (fieldsToCreate.priceAfterDiscount === undefined)
+    delete fieldsToCreate.priceAfterDiscount;
+
   return factory.create(productModel)(
     fieldsToCreate,
     processedImage,
@@ -78,58 +83,47 @@ export const create = async (
   );
 };
 
-export const update = async (id, fieldsToUpdate, processedImage) => {
-  let oldProduct = null;
+export const update = async (
+  id,
+  fieldsToUpdate,
+  currentProduct,
+  processedImage,
+) => {
+  const { category, subCategories, price, discountPercentage } = fieldsToUpdate;
 
-  const { category, subCategories, imageCover, price, discountPercentage } =
-    fieldsToUpdate;
+  const updateQuery = { $set: fieldsToUpdate };
 
-  const needsOldData =
-    category !== undefined ||
-    subCategories !== undefined ||
-    imageCover !== undefined ||
-    price !== undefined ||
-    discountPercentage !== undefined;
+  await validateProductData(category, subCategories, currentProduct);
 
-  if (needsOldData) {
-    oldProduct = await factory.getById(productModel)(
-      id,
-      "category imageCover price discountPercentage",
+  if (price !== undefined || discountPercentage !== undefined) {
+    if (!currentProduct) {
+      console.error("Current product data is required to update pricing");
+
+      throw new ApiError(
+        "Something went wrong on our side. Please try again later",
+        500,
+      );
+    }
+
+    const productPrice = price || currentProduct.price;
+    const productDiscountPercentage =
+      discountPercentage ?? currentProduct.discountPercentage;
+
+    const newPriceAfterDiscount = calculatePriceAfterDiscount(
+      productPrice,
+      productDiscountPercentage,
     );
 
-    if (!oldProduct)
-      throw new ApiError(`No document found with id: ${id}`, 404);
-
-    await validateProductData(category, subCategories, oldProduct);
-
-    if (price !== undefined || discountPercentage !== undefined) {
-      const productPrice = price !== undefined ? price : oldProduct.price;
-      const productDiscountPercentage =
-        discountPercentage ?? oldProduct.discountPercentage;
-
-      const newPriceAfterDiscount = calculatePriceAfterDiscount(
-        productPrice,
-        productDiscountPercentage,
-      );
-
-      if (newPriceAfterDiscount === undefined) {
-        delete fieldsToUpdate.priceAfterDiscount;
-        delete fieldsToUpdate.discountPercentage;
-      } else {
-        fieldsToUpdate.priceAfterDiscount = newPriceAfterDiscount;
-      }
+    if (
+      newPriceAfterDiscount === undefined &&
+      productDiscountPercentage !== undefined
+    ) {
+      delete fieldsToUpdate.priceAfterDiscount;
+      updateQuery.$unset = { priceAfterDiscount: "" };
+    } else {
+      fieldsToUpdate.priceAfterDiscount = newPriceAfterDiscount;
     }
   }
-
-  const hasUnset =
-    discountPercentage !== undefined && parseInt(discountPercentage, 10) === 0;
-
-  const updateQuery = hasUnset
-    ? {
-        $set: fieldsToUpdate,
-        $unset: { discountPercentage: "", priceAfterDiscount: "" },
-      }
-    : { $set: fieldsToUpdate };
 
   const doc = await productModel.findOneAndUpdate({ _id: id }, updateQuery, {
     returnDocument: "after",

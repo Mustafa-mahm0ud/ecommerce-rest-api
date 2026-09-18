@@ -6,6 +6,8 @@ import {
   ALLOWED_PRODUCT_FIELDS,
   ALLOWED_PRODUCT_CREATE_FIELDS,
 } from "../utils/constants/product-fields.js";
+import pickAllowedFields from "../helpers/pick-allowed-fields.js";
+import { deleteOldSingleImage } from "../services/storage/local-storage/delete-files.js";
 
 const populateOptions = {
   path: "category brand subCategories",
@@ -41,12 +43,24 @@ export const createProduct = factory.create(
  *@route       PATCH /api/v1/products/:id
  *@access      Private
  */
-export const updateProduct = factory.update(
-  ALLOWED_PRODUCT_FIELDS,
-  productService,
-  "imageCover",
-  "products",
-);
+export const updateProduct = asyncHandler(async (req, res, next) => {
+  const doc = await productService.update(
+    req.params.id,
+    pickAllowedFields(ALLOWED_PRODUCT_FIELDS, req.body),
+    req.currentProduct,
+    req.processedImage,
+  );
+
+  res.status(200).json({ status: "success", data: doc });
+
+  res.on("finish", () => {
+    const oldValue = req.currentProduct.imageCover;
+    const newValue = doc.imageCover;
+
+    deleteOldSingleImage(oldValue, newValue, "products");
+  });
+});
+
 /**
  *@desc        Delete Product
  *@route       DELETE /api/v1/products/:id

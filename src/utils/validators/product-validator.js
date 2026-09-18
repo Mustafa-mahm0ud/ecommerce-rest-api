@@ -1,14 +1,10 @@
 import { param, body } from "express-validator";
 import mongoose from "mongoose";
 
-import validatorMiddleware from "../../middlewares/validator-middleware.js";
-import requireAtLeastOneField from "../require-at-least-one-field.js";
 import { ALLOWED_PRODUCT_FIELDS } from "../constants/product-fields.js";
-
-const requiredOrOptional = (field, isRequired, msg) =>
-  isRequired
-    ? body(field).trim().notEmpty().withMessage(msg)
-    : body(field).trim().optional();
+import requireAtLeastOneField from "../require-at-least-one-field.js";
+import requiredOrOptional from "../../helpers/required-or-optional.js";
+import validatorMiddleware from "../../middlewares/validator-middleware.js";
 
 const titleValidator = (isRequired = false) =>
   requiredOrOptional("title", isRequired, "You must enter the title")
@@ -27,7 +23,8 @@ const descriptionValidator = (isRequired = false) =>
 const quantityValidator = (isRequired = false) =>
   requiredOrOptional("quantity", isRequired, "You must enter the quantity")
     .isInt({ min: 1 })
-    .withMessage("Product quantity must be at least one");
+    .withMessage("Product quantity must be at least one")
+    .toInt();
 
 const priceValidator = (isRequired = false) =>
   requiredOrOptional("price", isRequired, "You must enter the price")
@@ -38,12 +35,16 @@ const priceValidator = (isRequired = false) =>
 const discountPercentageValidator = () =>
   body("discountPercentage")
     .optional()
-    .isFloat({ min: 0, max: 100 })
-    .withMessage("Discount percentage must be between 0 and 100");
+    .isInt({ min: 0, max: 100 })
+    .withMessage("Discount percentage must be between 0 and 100")
+    .toInt();
 
 const colorsValidator = () => [
   body("colors").optional().isArray().withMessage("colors must be an array"),
-  body("colors.*").isString().withMessage("each color must be a string"),
+  body("colors.*")
+    .optional()
+    .isString()
+    .withMessage("each color must be a string"),
 ];
 
 const imagesValidator = (isRequired = false) =>
