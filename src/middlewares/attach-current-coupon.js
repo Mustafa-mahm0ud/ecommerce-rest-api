@@ -17,7 +17,7 @@ const attachCurrentCoupon = asyncHandler(async (req, res, next) => {
 
   const coupon = await couponModel
     .findById(req.params.id)
-    .select("discountType maxDiscount startDate expire");
+    .select("discountType discountValue maxDiscount usedBy startDate expire");
 
   if (!coupon) {
     return next(new ApiError(`No coupon found with id ${req.params.id}`, 404));
