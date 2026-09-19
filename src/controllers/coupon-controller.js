@@ -2,13 +2,8 @@ import * as factory from "./crud-controller.js";
 import * as couponService from "../services/database/coupon-service.js";
 import ALLOWED_COUPON_FIELDS from "../utils/constants/coupon-fields.js";
 
-const populateOptions = {
-  path: "usedBy",
-  select: "firstName lastName email phone",
-};
-
 export const getCoupons = factory.getDocs(couponService);
-export const getCoupon = factory.getDoc(couponService, populateOptions);
+export const getCoupon = factory.getDoc(couponService);
 export const createCoupon = factory.create(
   ALLOWED_COUPON_FIELDS,
   couponService,
