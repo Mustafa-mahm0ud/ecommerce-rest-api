@@ -5,7 +5,10 @@ import * as factory from "./crud-controller.js";
 import * as reviewService from "../services/database/review-service.js";
 import ALLOWED_REVIEW_FIELDS from "../utils/constants/review-fields.js";
 
-const populateOptions = { path: "user", select: "name profileImage" };
+const populateOptions = {
+  path: "user",
+  select: "firstName lastName profileImage",
+};
 
 /**
  *@desc        Get Reviews
