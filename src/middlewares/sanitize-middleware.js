@@ -4,11 +4,7 @@ const sanitizeObject = (obj) => {
   if (obj === null || typeof obj !== "object") return obj;
 
   Object.keys(obj).forEach((key) => {
-    if (
-      key.startsWith("$") ||
-      key.includes(".") ||
-      forbiddenKeys.has(key)
-    ) {
+    if (key.startsWith("$") || key.includes(".") || forbiddenKeys.has(key)) {
       delete obj[key];
       return;
     }
