@@ -55,7 +55,7 @@ export const addProduct = async (userId, productId) => {
   await wishlistModel.findOneAndUpdate(
     { user: userId },
     { $addToSet: { products: productId } },
-    { returnDocument: "after", upsert: true },
+    { upsert: true },
   );
 
   return getWishlist(userId);
