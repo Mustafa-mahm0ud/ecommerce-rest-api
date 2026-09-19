@@ -1,13 +1,9 @@
 import asyncHandler from "express-async-handler";
 
 import * as authService from "../services/database/auth-service.js";
-
-const REFRESH_TOKEN_COOKIE_OPTIONS = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "strict",
-  maxAge: 30 * 24 * 60 * 60 * 1000,
-};
+import REFRESH_TOKEN_COOKIE_OPTIONS from "../utils/constants/cookie-options.js";
+import { AUTH_RESPONSE_FIELDS } from "../utils/constants/user-fields.js";
+import pickAllowedFields from "../helpers/pick-allowed-fields.js";
 
 const sendAuthResponse = (
   res,
@@ -18,7 +14,7 @@ const sendAuthResponse = (
 
   res.status(statusCode).json({
     status: "success",
-    data: user,
+    data: pickAllowedFields(AUTH_RESPONSE_FIELDS, user),
     accessToken,
   });
 };

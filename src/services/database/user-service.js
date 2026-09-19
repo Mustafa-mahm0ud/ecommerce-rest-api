@@ -2,9 +2,13 @@ import bcrypt from "bcryptjs";
 
 import userModel from "../../models/user-model.js";
 import * as factory from "./crud-service.js";
+import issueTokens from "./token-service.js";
 import ApiError from "../../utils/api-error.js";
 
-export const getDocs = factory.getDocs(userModel);
+export const getDocs = factory.getDocs(
+  userModel,
+  "firstName lastName email phone role active profileImage createdAt",
+);
 export const getDoc = factory.getDoc(userModel);
 export const del = factory.del(userModel);
 export const getById = factory.getById(userModel);
@@ -39,6 +43,8 @@ export const changePassword = async (id, reqBody) => {
   user.loggedOutAt = Date.now();
 
   await user.save();
+
+  return issueTokens(user);
 };
 
 export const deactivateUser = async (id) => {
