@@ -33,7 +33,7 @@ export const addAddress = async (userId, address) => {
 
   if (!doc) throw new ApiError(`No user found with id: ${userId}`, 404);
 
-  return doc;
+  return doc.addresses.id(newAddress._id);
 };
 
 export const updateAddress = async (userId, addressId, fieldsToUpdate = {}) => {
