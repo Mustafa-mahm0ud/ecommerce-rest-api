@@ -52,13 +52,13 @@ export const addProduct = async (userId, productId) => {
   if (!productExists)
     throw new ApiError(`No product found with id ${productId}`, 404);
 
-  const wishlist = await wishlistModel.findOneAndUpdate(
+  await wishlistModel.findOneAndUpdate(
     { user: userId },
     { $addToSet: { products: productId } },
     { returnDocument: "after", upsert: true },
   );
 
-  return wishlist;
+  return getWishlist(userId);
 };
 
 export const removeProduct = async (userId, productId) => {
