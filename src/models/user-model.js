@@ -74,7 +74,6 @@ const UserSchema = new mongoose.Schema(
     toJSON: {
       virtuals: true,
       transform(doc, ret) {
-        delete ret.profileImage;
         delete ret.password;
         delete ret.passwordChangedAt;
         delete ret.passwordResetCode;
@@ -88,18 +87,6 @@ const UserSchema = new mongoose.Schema(
     },
     toObject: {
       virtuals: true,
-      transform(doc, ret) {
-        delete ret.profileImage;
-        delete ret.password;
-        delete ret.passwordChangedAt;
-        delete ret.passwordResetCode;
-        delete ret.passwordResetExpires;
-        delete ret.passwordResetVerified;
-        delete ret.refreshTokenHash;
-        delete ret.loggedOutAt;
-        delete ret.__v;
-        return ret;
-      },
     },
     id: false,
   },

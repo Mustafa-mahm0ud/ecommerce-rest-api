@@ -86,20 +86,12 @@ const ProductSchema = new mongoose.Schema(
     toJSON: {
       virtuals: true,
       transform(doc, ret) {
-        delete ret.imageCover;
-        delete ret.images;
         delete ret.__v;
         return ret;
       },
     },
     toObject: {
       virtuals: true,
-      transform(doc, ret) {
-        delete ret.imageCover;
-        delete ret.images;
-        delete ret.__v;
-        return ret;
-      },
     },
     id: false,
   },

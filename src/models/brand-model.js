@@ -24,18 +24,12 @@ const BrandSchema = new mongoose.Schema(
     toJSON: {
       virtuals: true,
       transform(doc, ret) {
-        delete ret.image;
         delete ret.__v;
         return ret;
       },
     },
     toObject: {
       virtuals: true,
-      transform(doc, ret) {
-        delete ret.image;
-        delete ret.__v;
-        return ret;
-      },
     },
     id: false,
   },
