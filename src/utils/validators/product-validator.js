@@ -22,8 +22,8 @@ const descriptionValidator = (isRequired = false) =>
 
 const quantityValidator = (isRequired = false) =>
   requiredOrOptional("quantity", isRequired, "You must enter the quantity")
-    .isInt({ min: 1 })
-    .withMessage("Product quantity must be at least one")
+    .isInt({ min: 0 })
+    .withMessage("Product quantity can't be negative")
     .toInt();
 
 const priceValidator = (isRequired = false) =>
