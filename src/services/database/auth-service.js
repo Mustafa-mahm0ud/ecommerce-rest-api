@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import userModel from "../../models/user-model.js";
 import ApiError from "../../utils/api-error.js";
 import { generateAccessToken } from "../../utils/generate-token.js";
-import resolveResetCode from "../../utils/resolve-reset-code .js";
+import resolveResetCode from "../../utils/resolve-reset-code.js";
 import hashValue from "../../helpers/hash-value.js";
 import sendEmail from "../../utils/send-email.js";
 import issueTokens from "./token-service.js";
