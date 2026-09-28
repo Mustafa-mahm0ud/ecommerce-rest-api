@@ -9,6 +9,7 @@ import hashValue from "../../helpers/hash-value.js";
 import sendEmail from "../../utils/send-email.js";
 import issueTokens from "./token-service.js";
 import clearPasswordResetFields from "../../helpers/clear-password-reset-fields.js";
+import generateResetToken from "../../utils/generate-reset-token.js";
 
 export const registerUser = async (firstName, lastName, email, password) => {
   // There's no need to check that the email exists. We have a handle duplicate key in error-middleware.
@@ -116,24 +117,34 @@ export const verifyResetCode = async (email, resetCode) => {
 
   if (!user) throw new ApiError("Invalid or expired reset code", 400);
 
-  user.passwordResetVerified = true;
+  const { resetToken, resetTokenHash } = generateResetToken();
+
+  user.passwordResetTokenHash = resetTokenHash;
+  user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+  user.passwordResetCode = undefined;
+
   await user.save();
+
+  return resetToken;
 };
 
-export const resetPassword = async (email, newPassword) => {
-  const user = await userModel.findOne({ email });
+export const resetPassword = async (resetToken, newPassword) => {
+  const resetTokenHash = hashValue(resetToken);
 
-  if (!user?.passwordResetVerified)
-    throw new ApiError("Reset code not verified", 400);
+  const user = await userModel.findOne({
+    passwordResetTokenHash: resetTokenHash,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new ApiError("Invalid or expired reset token", 400);
+  }
 
   user.password = newPassword;
   user.refreshTokenHash = undefined;
   user.loggedOutAt = Date.now();
 
   clearPasswordResetFields(user);
+
   await user.save();
-
-  const { accessToken, refreshToken } = await issueTokens(user);
-
-  return { accessToken, refreshToken };
 };

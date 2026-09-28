@@ -104,9 +104,9 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
 export const verifyResetCode = asyncHandler(async (req, res, next) => {
   const { email, resetCode } = req.body;
 
-  await authService.verifyResetCode(email, resetCode);
+  const resetToken = await authService.verifyResetCode(email, resetCode);
 
-  res.status(200).json({ status: "success" });
+  res.status(200).json({ status: "success", resetToken });
 });
 
 /**
@@ -115,13 +115,12 @@ export const verifyResetCode = asyncHandler(async (req, res, next) => {
  *@access      Public
  */
 export const resetPassword = asyncHandler(async (req, res, next) => {
-  const { email, newPassword } = req.body;
+  const { resetToken, newPassword } = req.body;
 
-  const { accessToken, refreshToken } = await authService.resetPassword(
-    email,
-    newPassword,
-  );
+  await authService.resetPassword(resetToken, newPassword);
 
-  res.cookie("refreshToken", refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
-  res.status(200).json({ status: "success", accessToken });
+  res.status(200).json({
+    status: "success",
+    message: "Password reset successfully. Please login again",
+  });
 });
