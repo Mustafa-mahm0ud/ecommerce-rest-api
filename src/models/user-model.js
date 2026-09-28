@@ -54,6 +54,7 @@ const UserSchema = new mongoose.Schema(
     passwordResetCode: String,
     passwordResetExpires: Date,
     passwordResetTokenHash: String,
+    passwordResetTokenExpires: Date,
     refreshTokenHash: {
       type: String,
       select: false,

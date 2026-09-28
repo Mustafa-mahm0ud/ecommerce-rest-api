@@ -11,6 +11,8 @@ import issueTokens from "./token-service.js";
 import clearPasswordResetFields from "../../helpers/clear-password-reset-fields.js";
 import generateResetToken from "../../utils/generate-reset-token.js";
 
+const getResetExpiration = () => Date.now() + 10 * 60 * 1000;
+
 export const registerUser = async (firstName, lastName, email, password) => {
   // There's no need to check that the email exists. We have a handle duplicate key in error-middleware.
   const user = await userModel.create({ firstName, lastName, email, password });
@@ -73,19 +75,16 @@ export const logout = async (refreshToken) => {
 };
 
 export const forgotPassword = async (email) => {
-  const user = await userModel
-    .findOne({ email })
-    .select(
-      "firstName passwordResetCode passwordResetExpires passwordResetVerified",
-    );
+  const user = await userModel.findOne({ email });
 
   if (!user) return;
 
   const { resetCode, hashedResetCode } = resolveResetCode();
 
   user.passwordResetCode = hashedResetCode;
-  user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
-  user.passwordResetVerified = false;
+  user.passwordResetExpires = getResetExpiration();
+  user.passwordResetTokenHash = undefined;
+  user.passwordResetTokenExpires = undefined;
 
   await user.save();
 
@@ -120,8 +119,9 @@ export const verifyResetCode = async (email, resetCode) => {
   const { resetToken, resetTokenHash } = generateResetToken();
 
   user.passwordResetTokenHash = resetTokenHash;
-  user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+  user.passwordResetTokenExpires = getResetExpiration();
   user.passwordResetCode = undefined;
+  user.passwordResetExpires = undefined;
 
   await user.save();
 
@@ -133,7 +133,7 @@ export const resetPassword = async (resetToken, newPassword) => {
 
   const user = await userModel.findOne({
     passwordResetTokenHash: resetTokenHash,
-    passwordResetExpires: { $gt: Date.now() },
+    passwordResetTokenExpires: { $gt: Date.now() },
   });
 
   if (!user) {
