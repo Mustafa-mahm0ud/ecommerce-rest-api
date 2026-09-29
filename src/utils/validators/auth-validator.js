@@ -62,7 +62,12 @@ export const verifyResetCodeValidator = [
 ];
 
 export const resetPasswordValidator = [
-  emailValidator(),
+  body("resetToken")
+    .trim()
+    .notEmpty()
+    .withMessage("Reset token is required")
+    .isLength({ min: 64, max: 64 })
+    .withMessage("Invalid or expire reset token"),
 
   body("newPassword")
     .trim()
