@@ -4,6 +4,7 @@ export const ALLOWED_PRODUCT_FIELDS = [
   "quantity",
   "price",
   "discountPercentage",
+  "colors",
   "imageCover",
   "category",
   "subCategories",
