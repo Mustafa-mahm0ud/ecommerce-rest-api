@@ -1,7 +1,7 @@
 import { param, body } from "express-validator";
 import mongoose from "mongoose";
 
-import { ALLOWED_PRODUCT_FIELDS } from "../constants/product-fields.js";
+import { ALLOWED_PRODUCT_UPDATE_FIELDS } from "../constants/product-fields.js";
 import requireAtLeastOneField from "../require-at-least-one-field.js";
 import requiredOrOptional from "../../helpers/required-or-optional.js";
 import validatorMiddleware from "../../middlewares/validator-middleware.js";
@@ -39,12 +39,35 @@ const discountPercentageValidator = () =>
     .withMessage("Discount percentage must be between 0 and 100")
     .toInt();
 
-const colorsValidator = () => [
-  body("colors").optional().isArray().withMessage("colors must be an array"),
-  body("colors.*")
+const variantValidator = () => [
+  body("variants")
+    .isArray({ min: 1 })
+    .withMessage("variants must be a non-empty array"),
+
+  body("variants.*").isObject().withMessage("Each variant must be an object"),
+
+  body("variants.*.color")
     .optional()
     .isString()
-    .withMessage("each color must be a string"),
+    .trim()
+    .notEmpty()
+    .toLowerCase(),
+
+  body("variants.*.size").optional().isString().trim().notEmpty().toUpperCase(),
+
+  body("variants.*.quantity")
+    .notEmpty()
+    .withMessage("Variant quantity is required")
+    .bail()
+    .isInt({ min: 0 })
+    .withMessage("Quantity must be an integer >= 0")
+    .toInt(),
+
+  body("variants.*.isAvailable")
+    .optional()
+    .isBoolean()
+    .withMessage("isAvailable must be a boolean value")
+    .toBoolean(),
 ];
 
 const imagesValidator = (isRequired = false) =>
@@ -100,7 +123,7 @@ export const createProductValidator = [
   quantityValidator(true),
   priceValidator(true),
   discountPercentageValidator(),
-  ...colorsValidator(),
+  ...variantValidator(),
   imagesValidator(),
   categoryValidator(true),
   subCategoriesValidator(),
@@ -122,14 +145,13 @@ export const createProductValidator = [
 export const updateProductValidator = [
   param("id").isMongoId().withMessage("Invalid product id format"),
 
-  requireAtLeastOneField(ALLOWED_PRODUCT_FIELDS),
+  requireAtLeastOneField(ALLOWED_PRODUCT_UPDATE_FIELDS),
 
   titleValidator(),
   descriptionValidator(),
   quantityValidator(),
   priceValidator(),
   discountPercentageValidator(),
-  ...colorsValidator(),
   categoryValidator(),
   subCategoriesValidator(),
   brandValidator(),
