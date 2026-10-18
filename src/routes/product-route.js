@@ -7,6 +7,8 @@ import * as productController from "../controllers/product-controller.js";
 import * as productValidator from "../utils/validators/product-validator.js";
 import { nestedReviewRouter } from "./review-route.js";
 import attachCurrentProduct from "../middlewares/attach-current-product.js";
+import variantRouter from "./variant-route.js";
+import parseVariants from "../middlewares/parse-variants-middleware.js";
 
 const uploadCoverImage = multerUploadMiddleware.uploadSingleImage("imageCover");
 
@@ -30,6 +32,7 @@ const resizeGalleryImages = localUploadMiddleware.uploadImagesToLocalStorage(
 const router = express.Router();
 
 router.use("/:productId/reviews", nestedReviewRouter);
+router.use("/:productId/variants", variantRouter);
 
 // Public
 router.get("/", productController.getProducts);
@@ -49,6 +52,7 @@ router.use(authMiddleware.allowedTo("admin"));
 router.post(
   "/",
   uploadMixOfImages,
+  parseVariants,
   productValidator.createProductValidator,
   resizeCoverImage,
   resizeGalleryImages,
@@ -56,7 +60,7 @@ router.post(
 );
 
 router
-  .route("/:id")
+  .route("/:productId")
   .patch(
     uploadCoverImage,
     productValidator.updateProductValidator,

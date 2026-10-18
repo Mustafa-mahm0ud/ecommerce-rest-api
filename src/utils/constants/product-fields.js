@@ -1,17 +1,25 @@
-export const ALLOWED_PRODUCT_FIELDS = [
+export const ALLOWED_PRODUCT_CREATE_FIELDS = [
   "title",
   "description",
   "quantity",
   "price",
   "discountPercentage",
-  "colors",
+  "variants",
   "imageCover",
+  "images",
   "category",
   "subCategories",
   "brand",
 ];
 
-export const ALLOWED_PRODUCT_CREATE_FIELDS = [
-  ...ALLOWED_PRODUCT_FIELDS,
-  "images",
+export const ALLOWED_PRODUCT_UPDATE_FIELDS = [
+  "title",
+  "description",
+  "quantity",
+  "price",
+  "discountPercentage",
+  "imageCover",
+  "category",
+  "subCategories",
+  "brand",
 ];

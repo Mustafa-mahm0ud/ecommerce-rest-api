@@ -5,16 +5,12 @@ import Category from "../../models/category-model.js";
 import SubCategory from "../../models/subcategory-model.js";
 import calculatePriceAfterDiscount from "../../helpers/product-calculations.js";
 import writeProcessedFiles from "../storage/local-storage/write-processed-files.js";
-import ApiError from "../../utils/api-error.js";
 import * as factory from "./crud-service.js";
+import ApiFeatures from "../../utils/api-features.js";
+import ApiError from "../../utils/api-error.js";
 
-export const getDocs = factory.getDocs(
-  productModel,
-  "title price slug imageCover discountPercentage priceAfterDiscount avgRatings ratingsCount",
-);
 export const getById = factory.getById(productModel);
-export const getDoc = factory.getDoc(productModel);
-export const del = factory.del(productModel);
+export const hardDelete = factory.del(productModel);
 export const addImage = factory.addImage(productModel);
 export const deleteImage = factory.deleteImage(productModel);
 
@@ -24,8 +20,8 @@ export const validateProductData = async (
   currentProduct,
 ) => {
   if (category) {
-    const isCategoryExist = await Category.exists({ _id: category });
-    if (!isCategoryExist) {
+    const categoryExist = await Category.exists({ _id: category });
+    if (!categoryExist) {
       throw new ApiError(`No category found with id: ${category}`, 400);
     }
   }
@@ -60,12 +56,58 @@ export const validateProductData = async (
   }
 };
 
-export const create = async (
+export const getDocs = async (
+  reqQuery,
+  { includeDeleted = false, populateOptions = null, select = "" } = {},
+) => {
+  const filter = includeDeleted ? {} : { isDeleted: false };
+
+  const apiFeatures = new ApiFeatures(productModel.find(filter), reqQuery)
+    .filtering()
+    .search()
+    .sort()
+    .limitFields(select)
+    .paginate();
+
+  if (populateOptions) apiFeatures.customPopulate(populateOptions);
+
+  const { mongooseQuery, filterQuery } = apiFeatures;
+
+  const [docs, totalDocs] = await Promise.all([
+    mongooseQuery,
+    productModel.countDocuments({ ...filter, ...filterQuery }),
+  ]);
+
+  const paginationResult = apiFeatures.buildPaginationResult(totalDocs);
+
+  return { docs, paginationResult };
+};
+
+export const getDoc = async (
+  id,
+  { populateOptions = {}, includeDeleted = false } = {},
+) => {
+  const filter = { _id: id };
+  if (!includeDeleted) filter.isDeleted = false;
+
+  const query = productModel.findOne(filter);
+
+  if (populateOptions) query.populate(populateOptions);
+
+  const product = await query;
+
+  if (!product) throw new ApiError(`No document found with id: ${id}`, 404);
+
+  return product;
+};
+
+export const create = async ({
   fieldsToCreate,
   processedImage,
   processedImages,
-) => {
+}) => {
   const { category, subCategories, price, discountPercentage } = fieldsToCreate;
+
   await validateProductData(category, subCategories);
 
   fieldsToCreate.priceAfterDiscount = calculatePriceAfterDiscount(
@@ -83,12 +125,12 @@ export const create = async (
   );
 };
 
-export const update = async (
-  id,
+export const update = async ({
+  productId,
   fieldsToUpdate,
   currentProduct,
   processedImage,
-) => {
+}) => {
   const { category, subCategories, price, discountPercentage } = fieldsToUpdate;
 
   const updateQuery = { $set: fieldsToUpdate };
@@ -125,14 +167,26 @@ export const update = async (
     }
   }
 
-  const doc = await productModel.findOneAndUpdate({ _id: id }, updateQuery, {
-    returnDocument: "after",
-    runValidators: true,
-  });
+  const doc = await productModel.findOneAndUpdate(
+    { _id: productId, isDeleted: false },
+    updateQuery,
+    {
+      returnDocument: "after",
+      runValidators: true,
+    },
+  );
 
-  if (!doc) throw new ApiError(`No document found with id: ${id}`, 404);
+  if (!doc) throw new ApiError(`Product not found`, 404);
 
   if (processedImage) await writeProcessedFiles([processedImage]);
 
   return doc;
+};
+
+export const del = async (id) => {
+  const product = await productModel.updateOne(
+    { _id: id, isDeleted: false },
+    { isDeleted: true, deletedAt: new Date() },
+  );
+  if (!product.matchedCount) throw new ApiError("Product not found", 404);
 };
