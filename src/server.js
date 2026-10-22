@@ -57,7 +57,9 @@ const startServer = async () => {
     );
 
     process.on("unhandledRejection", (err) => {
-      console.error(`Unhandled Rejection: ${err.name} | ${err.message}`);
+      console.error(
+        `Unhandled Rejection: ${err.name} | ${err.message}\n${err.stack}`,
+      );
       server.close(() => {
         console.error("Shutting Down due to unhandled rejection...");
         process.exit(1);
@@ -65,7 +67,9 @@ const startServer = async () => {
     });
 
     process.on("uncaughtException", (err) => {
-      console.error(`Uncaught Exception: ${err.name} | ${err.message}`);
+      console.error(
+        `Uncaught Exception: ${err.name} | ${err.message}\n${err.stack}`,
+      );
       server.close(() => {
         console.error("Shutting Down due to uncaught exception...");
         process.exit(1);
