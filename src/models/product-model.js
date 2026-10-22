@@ -20,11 +20,6 @@ const ProductSchema = new mongoose.Schema(
       minlength: 20,
       maxlength: 2000,
     },
-    quantity: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
     sold: {
       type: Number,
       default: 0,
@@ -44,7 +39,35 @@ const ProductSchema = new mongoose.Schema(
     priceAfterDiscount: {
       type: Number,
     },
-    colors: [{ type: String }],
+    variants: {
+      type: [
+        {
+          color: { type: String, trim: true, lowercase: true },
+          size: { type: String, uppercase: true },
+          quantity: {
+            type: Number,
+            required: [true, "Quantity is required"],
+            min: [0, "Quantity can't be negative"],
+          },
+          isAvailable: { type: Boolean, default: true },
+        },
+      ],
+      validate: [
+        {
+          validator: (variants) => variants.length > 0,
+          message: "Product must have at least one variant",
+        },
+        {
+          validator: (variants) => {
+            const keys = variants.map(
+              (v) => `${v.color ?? ""}|${v.size ?? ""}`,
+            );
+            return new Set(keys).size === keys.length;
+          },
+          message: "Duplicate color/size combination",
+        },
+      ],
+    },
     imageCover: {
       type: String,
       required: true,
@@ -80,6 +103,8 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    isDeleted: { type: Boolean, default: false },
+    deletedAt: Date,
   },
   {
     timestamps: true,
