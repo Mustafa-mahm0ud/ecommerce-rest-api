@@ -1,8 +1,6 @@
-import mongoose from "mongoose";
-
 import productModel from "../../models/product-model.js";
-import Category from "../../models/category-model.js";
-import SubCategory from "../../models/subcategory-model.js";
+import categoryModel from "../../models/category-model.js";
+import subcategoryModel from "../../models/subcategory-model.js";
 import calculatePriceAfterDiscount from "../../helpers/product-calculations.js";
 import writeProcessedFiles from "../storage/local-storage/write-processed-files.js";
 import * as factory from "./crud-service.js";
@@ -20,32 +18,27 @@ export const validateProductData = async ({
   currentProduct,
 }) => {
   if (category) {
-    const categoryExist = await Category.exists({ _id: category });
+    const categoryExist = await categoryModel.exists({ _id: category });
     if (!categoryExist) {
       throw new ApiError(`No category found with id: ${category}`, 400);
     }
   }
 
   if (subCategoriesIds?.length > 0) {
+    const uniqueIds = [...new Set(subCategoriesIds)];
+
     const targetCategory = category || currentProduct?.category;
 
     if (!targetCategory) {
       throw new ApiError("Product must belong to a parent category", 400);
     }
 
-    const [{ count = 0 } = {}] = await SubCategory.aggregate([
-      {
-        $match: {
-          _id: {
-            $in: subCategoriesIds.map(
-              (subCategoryId) => new mongoose.Types.ObjectId(subCategoryId),
-            ),
-          },
-          category: new mongoose.Types.ObjectId(targetCategory),
-        },
+    const count = await subcategoryModel.countDocuments({
+      _id: {
+        $in: uniqueIds,
       },
-      { $count: "count" },
-    ]);
+      category: targetCategory,
+    });
 
     if (count !== subCategoriesIds.length) {
       throw new ApiError(
