@@ -12,7 +12,6 @@ export const getDocs = ({ service, populateOptions }) =>
     });
 
     res.status(200).json({
-      status: "success",
       results: docs.length,
       paginationResult,
       data: docs,
@@ -29,7 +28,7 @@ export const getDoc = ({ service, populateOptions, getIdFromUser = false }) =>
       populateOptions,
     });
 
-    res.status(200).json({ status: "success", data: doc });
+    res.status(200).json({ data: doc });
   });
 
 export const create = ({ service, fieldsToCreate }) =>
@@ -40,7 +39,7 @@ export const create = ({ service, fieldsToCreate }) =>
       processedImages: req.processedImages,
     });
 
-    res.status(201).json({ status: "success", data: doc });
+    res.status(201).json({ data: doc });
   });
 
 export const update = ({
@@ -63,7 +62,7 @@ export const update = ({
       processedImage: req.processedImage,
     });
 
-    res.status(200).json({ status: "success", data: doc });
+    res.status(200).json({ data: doc });
 
     if (!imageField || !folderName) return;
 

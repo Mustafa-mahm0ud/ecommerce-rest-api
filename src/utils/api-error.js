@@ -5,7 +5,6 @@ export default class ApiError extends Error {
 
     super(baseMessage);
     this.statusCode = statusCode;
-    this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
     this.errors = isObjectMessage ? message : { general: message };
     this.isOperational = isOperational;
     if (stack) this.stack = stack;

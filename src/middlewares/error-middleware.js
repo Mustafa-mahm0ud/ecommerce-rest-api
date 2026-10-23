@@ -47,7 +47,6 @@ const handleValidationError = (err) => {
 
 const sendErrorForDev = (err, res) => {
   res.status(err.statusCode).json({
-    status: err.status,
     errors: err.errors,
     stack: err.stack,
   });
@@ -56,14 +55,12 @@ const sendErrorForDev = (err, res) => {
 const sendErrorForProd = (err, res) => {
   if (err.isOperational) {
     return res.status(err.statusCode).json({
-      status: err.status,
       errors: err.errors,
     });
   }
 
   console.error("ERROR INTERN:", err);
   res.status(500).json({
-    status: "error",
     errors: {
       general: "Something went wrong on our side. Please try again later",
     },
@@ -81,7 +78,6 @@ const errorHandler = (err, req, res, next) => {
     error = handleJwtError(err);
 
   error.statusCode = error.statusCode || 500;
-  error.status = error.status || "error";
   error.errors = error.errors || { general: error.message };
 
   if (process.env.NODE_ENV === "development") sendErrorForDev(error, res);

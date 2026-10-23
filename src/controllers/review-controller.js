@@ -44,7 +44,7 @@ export const createReview = asyncHandler(async (req, res, next) => {
     verifiedFields,
   });
 
-  res.status(201).json({ status: "success", data: review });
+  res.status(201).json({ data: review });
 });
 
 /**
@@ -61,7 +61,7 @@ export const updateReview = asyncHandler(async (req, res, next) => {
     verifiedFields,
   });
 
-  res.status(200).json({ status: "success", data: review });
+  res.status(200).json({ data: review });
 });
 
 /**

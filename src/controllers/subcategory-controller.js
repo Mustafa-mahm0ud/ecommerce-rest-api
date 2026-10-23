@@ -46,7 +46,7 @@ export const createSubCategory = asyncHandler(async (req, res, next) => {
     processedImage: req.processedImage,
   });
 
-  res.status(201).json({ status: "success", data: doc });
+  res.status(201).json({ data: doc });
 });
 
 /**
@@ -67,7 +67,7 @@ export const updateSubCategory = asyncHandler(async (req, res, next) => {
     processedImage: req.processedImage,
   });
 
-  res.status(200).json({ status: "success", data: doc });
+  res.status(200).json({ data: doc });
 });
 
 /**

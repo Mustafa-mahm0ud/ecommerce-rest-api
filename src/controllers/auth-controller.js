@@ -13,7 +13,6 @@ const sendAuthResponse = (
   res.cookie("refreshToken", refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
   res.status(statusCode).json({
-    status: "success",
     data: pickAllowedFields(AUTH_RESPONSE_FIELDS, user),
     accessToken,
   });
@@ -63,7 +62,7 @@ export const refreshAccessToken = asyncHandler(async (req, res, next) => {
 
   const accessToken = await authService.refreshAccessToken({ refreshToken });
 
-  res.status(200).json({ status: "success", accessToken });
+  res.status(200).json({ accessToken });
 });
 
 /**
@@ -91,7 +90,6 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
   await authService.forgotPassword({ email });
 
   res.status(200).json({
-    status: "success",
     message: "If an account exists for this email, a reset code has been sent",
   });
 });
@@ -106,7 +104,7 @@ export const verifyResetCode = asyncHandler(async (req, res, next) => {
 
   const resetToken = await authService.verifyResetCode({ email, resetCode });
 
-  res.status(200).json({ status: "success", resetToken });
+  res.status(200).json({ resetToken });
 });
 
 /**
@@ -120,7 +118,6 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
   await authService.resetPassword({ resetToken, newPassword });
 
   res.status(200).json({
-    status: "success",
     message: "Password reset successfully. Please login again",
   });
 });

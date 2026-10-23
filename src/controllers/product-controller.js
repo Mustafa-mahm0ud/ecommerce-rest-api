@@ -29,7 +29,6 @@ export const getProducts = asyncHandler(async (req, res, next) => {
   });
 
   res.status(200).json({
-    status: "success",
     results: docs.length,
     paginationResult,
     data: docs,
@@ -46,7 +45,7 @@ export const getProduct = asyncHandler(async (req, res, next) => {
 
   const doc = await productService.getDoc({ id, populateOptions });
 
-  res.status(200).json({ status: "success", data: doc });
+  res.status(200).json({ data: doc });
 });
 
 /**
@@ -70,7 +69,7 @@ export const createProduct = asyncHandler(async (req, res, next) => {
     processedImages: req.processedImages,
   });
 
-  res.status(201).json({ status: "success", data: doc });
+  res.status(201).json({ data: doc });
 });
 
 /**
@@ -91,7 +90,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     processedImage: req.processedImage,
   });
 
-  res.status(200).json({ status: "success", data: doc });
+  res.status(200).json({ data: doc });
 
   res.on("finish", () => {
     const oldValue = req.currentProduct.imageCover;

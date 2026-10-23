@@ -10,7 +10,7 @@ import * as wishlistService from "../services/database/wishlist-service.js";
 export const getWishlist = asyncHandler(async (req, res, next) => {
   const wishlist = await wishlistService.getWishlist({ userId: req.user._id });
 
-  res.status(200).json({ status: "success", data: wishlist });
+  res.status(200).json({ data: wishlist });
 });
 
 /**
@@ -24,7 +24,7 @@ export const addProduct = asyncHandler(async (req, res, next) => {
     productId: req.body.productId,
   });
 
-  res.status(200).json({ status: "success", data: wishlist });
+  res.status(200).json({ data: wishlist });
 });
 
 /**

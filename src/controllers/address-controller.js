@@ -10,7 +10,7 @@ export const addAddress = asyncHandler(async (req, res, next) => {
     address: pickAllowedFields(ALLOWED_ADDRESS_FIELDS, req.body),
   });
 
-  res.status(201).json({ status: "success", data: doc });
+  res.status(201).json({ data: doc });
 });
 
 export const updateAddress = asyncHandler(async (req, res, next) => {

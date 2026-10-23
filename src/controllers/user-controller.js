@@ -78,7 +78,7 @@ export const updateUserRole = asyncHandler(async (req, res, next) => {
     role: req.body.role,
   });
 
-  res.status(200).json({ status: "success", data: doc });
+  res.status(200).json({ data: doc });
 });
 
 /**
@@ -93,7 +93,7 @@ export const updateProfilePassword = asyncHandler(async (req, res, next) => {
   });
 
   res.cookie("refreshToken", refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
-  res.status(200).json({ status: "success", accessToken });
+  res.status(200).json({ accessToken });
 });
 
 /**
