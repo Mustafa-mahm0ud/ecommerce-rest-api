@@ -37,13 +37,13 @@ export const getProducts = asyncHandler(async (req, res, next) => {
 
 /**
  *@desc        Get Specific Product
- *@route       GET /api/v1/products/:id
+ *@route       GET /api/v1/products/:productId
  *@access      Public
  */
 export const getProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
+  const { productId } = req.params;
 
-  const doc = await productService.getDoc({ id, populateOptions });
+  const doc = await productService.getDoc({ productId, populateOptions });
 
   res.status(200).json({ data: doc });
 });
@@ -106,14 +106,14 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
  *@access      Private
  */
 export const deleteProduct = asyncHandler(async (req, res, next) => {
-  await productService.del({ id: req.params.productId });
+  await productService.del({ productId: req.params.productId });
 
   res.status(204).send();
 });
 
 /**
  *@desc         Add Image (Used to add image to the images field)
- *@route        POST /api/v1/products/:id/images
+ *@route        POST /api/v1/products/:productId/images
  *@access       Private
  */
 export const addProductImage = asyncHandler(async (req, res, next) => {

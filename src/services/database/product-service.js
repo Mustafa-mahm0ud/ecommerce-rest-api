@@ -72,11 +72,11 @@ export const getDocs = async ({ reqQuery, includeDeleted = false, select }) => {
 };
 
 export const getDoc = async ({
-  id,
+  productId,
   includeDeleted = false,
   populateOptions,
 }) => {
-  const filter = { _id: id };
+  const filter = { _id: productId };
   if (!includeDeleted) filter.isDeleted = false;
 
   const query = productModel.findOne(filter);
@@ -85,7 +85,8 @@ export const getDoc = async ({
 
   const product = await query;
 
-  if (!product) throw new ApiError(`No document found with id: ${id}`, 404);
+  if (!product)
+    throw new ApiError(`No document found with id: ${productId}`, 404);
 
   return product;
 };
@@ -172,9 +173,9 @@ export const update = async ({
   return doc;
 };
 
-export const del = async ({ id }) => {
+export const del = async ({ productId }) => {
   const product = await productModel.updateOne(
-    { _id: id, isDeleted: false },
+    { _id: productId, isDeleted: false },
     { isDeleted: true, deletedAt: new Date() },
   );
   if (!product.matchedCount) throw new ApiError("Product not found", 404);
