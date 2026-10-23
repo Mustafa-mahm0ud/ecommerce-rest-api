@@ -22,10 +22,10 @@ export const protect = asyncHandler(async (req, res, next) => {
   // The JWT errors was handled in a error-middleware
   const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-  const currentUser = await userService.getById(
-    decoded.userId,
-    "role active passwordChangedAt loggedOutAt",
-  );
+  const currentUser = await userService.getById({
+    id: decoded.userId,
+    fields: "role active passwordChangedAt loggedOutAt",
+  });
 
   if (!currentUser)
     return next(

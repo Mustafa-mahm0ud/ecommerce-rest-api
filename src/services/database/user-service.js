@@ -5,17 +5,18 @@ import * as factory from "./crud-service.js";
 import issueTokens from "./token-service.js";
 import ApiError from "../../utils/api-error.js";
 
-export const getDocs = factory.getDocs(
-  userModel,
-  "firstName lastName email phone role active profileImage createdAt",
-);
-export const getDoc = factory.getDoc(userModel);
-export const del = factory.del(userModel);
-export const getById = factory.getById(userModel);
-export const create = factory.create(userModel);
-export const update = factory.update(userModel);
+export const getDocs = factory.getDocs({
+  Model: userModel,
+  defaultFields:
+    "firstName lastName email phone role active profileImage createdAt",
+});
+export const getDoc = factory.getDoc({ Model: userModel });
+export const del = factory.del({ Model: userModel });
+export const getById = factory.getById({ Model: userModel });
+export const create = factory.create({ Model: userModel });
+export const update = factory.update({ Model: userModel });
 
-export const updateRole = async (id, role) => {
+export const updateRole = async ({ id, role }) => {
   const doc = await userModel.findOneAndUpdate(
     { _id: id },
     { role },
@@ -27,7 +28,7 @@ export const updateRole = async (id, role) => {
   return doc;
 };
 
-export const changePassword = async (id, reqBody) => {
+export const changePassword = async ({ id, reqBody }) => {
   const { currentPassword, newPassword } = reqBody;
 
   const user = await userModel.findOne({ _id: id }).select("+password");
@@ -47,7 +48,7 @@ export const changePassword = async (id, reqBody) => {
   return issueTokens(user);
 };
 
-export const deactivateUser = async (id) => {
+export const deactivateUser = async ({ id }) => {
   const doc = await userModel.findOneAndUpdate(
     { _id: id },
     { active: false },

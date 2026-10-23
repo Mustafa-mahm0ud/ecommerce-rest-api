@@ -4,8 +4,8 @@ import writeProcessedFiles from "../storage/local-storage/write-processed-files.
 import { deleteImageFile } from "../storage/local-storage/delete-files.js";
 
 export const getById =
-  (Model) =>
-  async (id, fields = "") => {
+  ({ Model }) =>
+  async ({ id, fields = "" }) => {
     const doc = await Model.findById(id).select(fields);
     if (!doc) throw new ApiError(`No document found with id: ${id}`, 404);
 
@@ -13,8 +13,8 @@ export const getById =
   };
 
 export const getDocs =
-  (Model, defaultFields = "", nestedFilterField = null) =>
-  async (reqQuery, reqParams = {}, populateOptions = null) => {
+  ({ Model, defaultFields = "", nestedFilterField = null }) =>
+  async ({ reqQuery, reqParams = {}, populateOptions = null }) => {
     const nestedId = nestedFilterField
       ? reqParams[`${nestedFilterField}Id`]
       : null;
@@ -43,8 +43,8 @@ export const getDocs =
   };
 
 export const getDoc =
-  (Model, defaultFields = "") =>
-  async (id, reqQuery, populateOptions) => {
+  ({ Model, defaultFields = "" }) =>
+  async ({ id, reqQuery, populateOptions }) => {
     const apiFeatures = new ApiFeatures(
       Model.findOne({ _id: id }),
       reqQuery,
@@ -59,7 +59,8 @@ export const getDoc =
   };
 
 export const create =
-  (Model) => async (fieldsToCreate, processedImage, processedImages) => {
+  ({ Model }) =>
+  async ({ fieldsToCreate, processedImage, processedImages }) => {
     const doc = await Model.create(fieldsToCreate);
 
     if (processedImage) await writeProcessedFiles([processedImage]);
@@ -69,7 +70,8 @@ export const create =
   };
 
 export const update =
-  (Model) => async (id, fieldsToUpdate, processedImage, processedImages) => {
+  ({ Model }) =>
+  async ({ id, fieldsToUpdate, processedImage, processedImages }) => {
     const doc = await Model.findOneAndUpdate(
       { _id: id },
       { $set: fieldsToUpdate },
@@ -87,49 +89,54 @@ export const update =
     return doc;
   };
 
-export const del = (Model) => async (id) => {
-  const doc = await Model.findOneAndDelete({ _id: id });
+export const del =
+  ({ Model }) =>
+  async ({ id }) => {
+    const doc = await Model.findOneAndDelete({ _id: id });
 
-  if (!doc) throw new ApiError(`No document found with id: ${id}`, 404);
+    if (!doc) throw new ApiError(`No document found with id: ${id}`, 404);
 
-  return doc;
-};
+    return doc;
+  };
 
-export const addImage = (Model) => async (id, newImages, processedImages) => {
-  const docExists = await Model.exists({ _id: id });
+export const addImage =
+  ({ Model }) =>
+  async ({ id, newImages, processedImages }) => {
+    const docExists = await Model.exists({ _id: id });
 
-  if (!docExists) throw new ApiError(`No document found with id: ${id}`, 404);
+    if (!docExists) throw new ApiError(`No document found with id: ${id}`, 404);
 
-  const newImagesCount = newImages.length;
+    const newImagesCount = newImages.length;
 
-  const doc = await Model.updateOne(
-    {
-      _id: id,
-      $expr: {
-        $lte: [{ $add: [{ $size: "$images" }, newImagesCount] }, 5],
+    const doc = await Model.updateOne(
+      {
+        _id: id,
+        $expr: {
+          $lte: [{ $add: [{ $size: "$images" }, newImagesCount] }, 5],
+        },
       },
-    },
-    { $push: { images: { $each: newImages } } },
-    { returnDocument: "after" },
-  );
-
-  if (doc.matchedCount === 0)
-    throw new ApiError(
-      "Too many files uploaded. The total number of document images must not exceed five image",
-      400,
+      { $push: { images: { $each: newImages } } },
+      { returnDocument: "after" },
     );
 
-  if (processedImages) await writeProcessedFiles(processedImages);
-};
+    if (doc.matchedCount === 0)
+      throw new ApiError(
+        "Too many files uploaded. The total number of document images must not exceed five image",
+        400,
+      );
+
+    if (processedImages) await writeProcessedFiles(processedImages);
+  };
 
 export const deleteImage =
-  (Model) => async (id, fieldName, folderName, imageName) => {
+  ({ Model }) =>
+  async ({ id, imageFieldName, folderName, imageName }) => {
     const docExists = await Model.exists({ _id: id });
     if (!docExists) throw new ApiError(`No document found with id: ${id}`, 404);
 
     const doc = await Model.updateOne(
-      { _id: id, [fieldName]: imageName },
-      { $pull: { [fieldName]: imageName } },
+      { _id: id, [imageFieldName]: imageName },
+      { $pull: { [imageFieldName]: imageName } },
       { returnDocument: "after" },
     );
 

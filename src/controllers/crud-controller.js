@@ -3,13 +3,13 @@ import asyncHandler from "express-async-handler";
 import pickAllowedFields from "../helpers/pick-allowed-fields.js";
 import * as deleteLocalFiles from "../services/storage/local-storage/delete-files.js";
 
-export const getDocs = (service, populateOptions) =>
+export const getDocs = ({ service, populateOptions }) =>
   asyncHandler(async (req, res, next) => {
-    const { docs, paginationResult } = await service.getDocs(
-      req.sanitizedQuery,
-      req.params,
+    const { docs, paginationResult } = await service.getDocs({
+      reqQuery: req.sanitizedQuery,
+      reqParams: req.params,
       populateOptions,
-    );
+    });
 
     res.status(200).json({
       status: "success",
@@ -19,43 +19,49 @@ export const getDocs = (service, populateOptions) =>
     });
   });
 
-export const getDoc = (service, populateOptions, getIdFromUser = false) =>
+export const getDoc = ({ service, populateOptions, getIdFromUser = false }) =>
   asyncHandler(async (req, res, next) => {
     const id = getIdFromUser ? req.user._id : req.params.id;
 
-    const doc = await service.getDoc(id, req.sanitizedQuery, populateOptions);
+    const doc = await service.getDoc({
+      id,
+      reqQuery: req.sanitizedQuery,
+      populateOptions,
+    });
 
     res.status(200).json({ status: "success", data: doc });
   });
 
-export const create = (fieldsToCreate, service) =>
+export const create = ({ service, fieldsToCreate }) =>
   asyncHandler(async (req, res, next) => {
-    const doc = await service.create(
-      pickAllowedFields(fieldsToCreate, req.body),
-      req.processedImage,
-      req.processedImages,
-    );
+    const doc = await service.create({
+      fieldsToCreate: pickAllowedFields(fieldsToCreate, req.body),
+      processedImage: req.processedImage,
+      processedImages: req.processedImages,
+    });
 
     res.status(201).json({ status: "success", data: doc });
   });
 
-export const update = (
-  fieldsToUpdate,
+export const update = ({
   service,
+  fieldsToUpdate,
   imageField,
   folderName,
   getIdFromUser = false,
-) =>
+}) =>
   asyncHandler(async (req, res, next) => {
     const id = getIdFromUser ? req.user._id : req.params.id;
 
-    const oldDoc = imageField ? await service.getById(id, imageField) : null;
+    const oldDoc = imageField
+      ? await service.getById({ id, fields: imageField })
+      : null;
 
-    const doc = await service.update(
+    const doc = await service.update({
       id,
-      pickAllowedFields(fieldsToUpdate, req.body),
-      req.processedImage,
-    );
+      fieldsToUpdate: pickAllowedFields(fieldsToUpdate, req.body),
+      processedImage: req.processedImage,
+    });
 
     res.status(200).json({ status: "success", data: doc });
 
@@ -69,11 +75,11 @@ export const update = (
     });
   });
 
-export const del = (service, imageFields, folderName) =>
+export const del = ({ service, imageFields, folderName }) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
-    const doc = await service.del(id);
+    const doc = await service.del({ id });
 
     res.status(204).send();
 

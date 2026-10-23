@@ -3,9 +3,9 @@ import reviewModel from "../../models/review-model.js";
 import ApiError from "../../utils/api-error.js";
 import * as factory from "./crud-service.js";
 
-export const getDoc = factory.getDoc(reviewModel);
+export const getDoc = factory.getDoc({ Model: reviewModel });
 
-export const getDocs = async (reqQuery, reqParams, populateOptions) => {
+export const getDocs = async ({ reqQuery, reqParams, populateOptions }) => {
   const { productId } = reqParams;
 
   const product = await Product.exists({ _id: productId });
@@ -20,7 +20,7 @@ export const getDocs = async (reqQuery, reqParams, populateOptions) => {
   );
 };
 
-export const create = async (userId, productId, verifiedFields) => {
+export const create = async ({ userId, productId, verifiedFields }) => {
   const product = await Product.exists({ _id: productId });
   if (!product)
     throw new ApiError(`No product found with id: ${productId}`, 404);
@@ -32,7 +32,7 @@ export const create = async (userId, productId, verifiedFields) => {
   });
 };
 
-export const update = async (userId, reviewId, verifiedFields) => {
+export const update = async ({ userId, reviewId, verifiedFields }) => {
   const userReview = await reviewModel.findOne({
     _id: reviewId,
     user: userId,
@@ -51,7 +51,7 @@ export const update = async (userId, reviewId, verifiedFields) => {
   return userReview;
 };
 
-export const deleteReview = async (userId, userRole, reviewId) => {
+export const deleteReview = async ({ userId, userRole, reviewId }) => {
   const filter =
     userRole === "admin" ? { _id: reviewId } : { _id: reviewId, user: userId };
 

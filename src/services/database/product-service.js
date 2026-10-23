@@ -14,11 +14,11 @@ export const hardDelete = factory.del(productModel);
 export const addImage = factory.addImage(productModel);
 export const deleteImage = factory.deleteImage(productModel);
 
-export const validateProductData = async (
+export const validateProductData = async ({
   category,
   subCategoriesIds,
   currentProduct,
-) => {
+}) => {
   if (category) {
     const categoryExist = await Category.exists({ _id: category });
     if (!categoryExist) {
@@ -56,10 +56,7 @@ export const validateProductData = async (
   }
 };
 
-export const getDocs = async (
-  reqQuery,
-  { includeDeleted = false, populateOptions = null, select = "" } = {},
-) => {
+export const getDocs = async ({ reqQuery, includeDeleted = false, select }) => {
   const filter = includeDeleted ? {} : { isDeleted: false };
 
   const apiFeatures = new ApiFeatures(productModel.find(filter), reqQuery)
@@ -68,8 +65,6 @@ export const getDocs = async (
     .sort()
     .limitFields(select)
     .paginate();
-
-  if (populateOptions) apiFeatures.customPopulate(populateOptions);
 
   const { mongooseQuery, filterQuery } = apiFeatures;
 
@@ -83,10 +78,11 @@ export const getDocs = async (
   return { docs, paginationResult };
 };
 
-export const getDoc = async (
+export const getDoc = async ({
   id,
-  { populateOptions = {}, includeDeleted = false } = {},
-) => {
+  includeDeleted = false,
+  populateOptions,
+}) => {
   const filter = { _id: id };
   if (!includeDeleted) filter.isDeleted = false;
 
@@ -108,7 +104,7 @@ export const create = async ({
 }) => {
   const { category, subCategories, price, discountPercentage } = fieldsToCreate;
 
-  await validateProductData(category, subCategories);
+  await validateProductData({ category, subCategories });
 
   fieldsToCreate.priceAfterDiscount = calculatePriceAfterDiscount(
     price,
@@ -135,7 +131,7 @@ export const update = async ({
 
   const updateQuery = { $set: fieldsToUpdate };
 
-  await validateProductData(category, subCategories, currentProduct);
+  await validateProductData({ category, subCategories, currentProduct });
 
   if (price !== undefined || discountPercentage !== undefined) {
     if (!currentProduct) {
@@ -183,7 +179,7 @@ export const update = async ({
   return doc;
 };
 
-export const del = async (id) => {
+export const del = async ({ id }) => {
   const product = await productModel.updateOne(
     { _id: id, isDeleted: false },
     { isDeleted: true, deletedAt: new Date() },

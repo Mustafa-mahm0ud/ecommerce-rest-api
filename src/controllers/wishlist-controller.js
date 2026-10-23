@@ -8,7 +8,7 @@ import * as wishlistService from "../services/database/wishlist-service.js";
  *@access      protect
  */
 export const getWishlist = asyncHandler(async (req, res, next) => {
-  const wishlist = await wishlistService.getWishlist(req.user._id);
+  const wishlist = await wishlistService.getWishlist({ userId: req.user._id });
 
   res.status(200).json({ status: "success", data: wishlist });
 });
@@ -19,10 +19,10 @@ export const getWishlist = asyncHandler(async (req, res, next) => {
  *@access      protect
  */
 export const addProduct = asyncHandler(async (req, res, next) => {
-  const wishlist = await wishlistService.addProduct(
-    req.user._id,
-    req.body.productId,
-  );
+  const wishlist = await wishlistService.addProduct({
+    userId: req.user._id,
+    productId: req.body.productId,
+  });
 
   res.status(200).json({ status: "success", data: wishlist });
 });
@@ -33,7 +33,10 @@ export const addProduct = asyncHandler(async (req, res, next) => {
  *@access      protect
  */
 export const removeProduct = asyncHandler(async (req, res, next) => {
-  await wishlistService.removeProduct(req.user._id, req.params.productId);
+  await wishlistService.removeProduct({
+    userId: req.user._id,
+    productId: req.params.productId,
+  });
 
   res.status(204).send();
 });

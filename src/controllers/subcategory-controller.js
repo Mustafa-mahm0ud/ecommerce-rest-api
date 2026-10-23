@@ -15,17 +15,19 @@ const populateOptions = { path: "category", select: "name slug" };
  *@route       GET /api/v1/categories/:categoryId/subcategories
  *@access      Public
  */
-export const getSubCategories = factory.getDocs(subCategoryService);
+export const getSubCategories = factory.getDocs({
+  service: subCategoryService,
+});
 
 /**
  *@desc        Get SubCategories
  *@route       GET /api/v1/subcategories/:id
  *@access      Public
  */
-export const getSubCategory = factory.getDoc(
-  subCategoryService,
+export const getSubCategory = factory.getDoc({
+  service: subCategoryService,
   populateOptions,
-);
+});
 
 /**
  *@desc        Create SubCategories
@@ -38,11 +40,11 @@ export const createSubCategory = asyncHandler(async (req, res, next) => {
     req.body,
   );
 
-  const doc = await subCategoryService.create(
-    verifiedFields,
-    req.params.categoryId,
-    req.processedImage,
-  );
+  const doc = await subCategoryService.create({
+    allowedFields: verifiedFields,
+    categoryId: req.params.categoryId,
+    processedImage: req.processedImage,
+  });
 
   res.status(201).json({ status: "success", data: doc });
 });
@@ -58,12 +60,12 @@ export const updateSubCategory = asyncHandler(async (req, res, next) => {
     req.body,
   );
 
-  const doc = await subCategoryService.update(
-    verifiedFields,
-    req.params.id,
-    req.body.category,
-    req.processedImage,
-  );
+  const doc = await subCategoryService.update({
+    allowedFields: verifiedFields,
+    subCategoryId: req.params.id,
+    categoryId: req.body.category,
+    processedImage: req.processedImage,
+  });
 
   res.status(200).json({ status: "success", data: doc });
 });
@@ -73,8 +75,8 @@ export const updateSubCategory = asyncHandler(async (req, res, next) => {
  *@route       DELETE /api/v1/subcategories/:id
  *@access      Private
  */
-export const deleteSubCategory = factory.del(
-  subCategoryService,
-  ["image"],
-  "subcategories",
-);
+export const deleteSubCategory = factory.del({
+  service: subCategoryService,
+  imageFields: ["image"],
+  folderName: "subcategories",
+});

@@ -7,37 +7,44 @@ import ALLOWED_BRAND_FIELDS from "../utils/constants/brand-fields.js";
  *@route       GET /api/v1/brands
  *@access      Public
  */
-export const getBrands = factory.getDocs(brandService);
+export const getBrands = factory.getDocs({ service: brandService });
 
 /**
  *@desc        Get Specific Brand
  * @route       GET /api/v1/brands/:id
  *@access      Public
  */
-export const getBrand = factory.getDoc(brandService);
+export const getBrand = factory.getDoc({ service: brandService });
 
 /**
  *@desc        Create Brand
  *@route       POST /api/v1/brands
  *@access      Private
  */
-export const createBrand = factory.create(ALLOWED_BRAND_FIELDS, brandService);
+export const createBrand = factory.create({
+  service: brandService,
+  fieldsToCreate: ALLOWED_BRAND_FIELDS,
+});
 
 /**
  *@desc        Update Brand
  *@route       PATCH /api/v1/brands/:id
  *@access      Private
  */
-export const updateBrand = factory.update(
-  ALLOWED_BRAND_FIELDS,
-  brandService,
-  "image",
-  "brands",
-);
+export const updateBrand = factory.update({
+  service: brandService,
+  fieldsToUpdate: ALLOWED_BRAND_FIELDS,
+  imageField: "image",
+  folderName: "brands",
+});
 
 /**
  *@desc        Delete Brand
  *@route       DELETE /api/v1/brands/:id
  *@access      Private
  */
-export const deleteBrand = factory.del(brandService, ["image"], "brands");
+export const deleteBrand = factory.del({
+  service: brandService,
+  imageFields: ["image"],
+  folderName: "brands",
+});

@@ -13,7 +13,12 @@ import generateResetToken from "../../utils/generate-reset-token.js";
 
 const getResetExpiration = () => Date.now() + 10 * 60 * 1000;
 
-export const registerUser = async (firstName, lastName, email, password) => {
+export const registerUser = async ({
+  firstName,
+  lastName,
+  email,
+  password,
+}) => {
   // There's no need to check that the email exists. We have a handle duplicate key in error-middleware.
   const user = await userModel.create({ firstName, lastName, email, password });
 
@@ -22,7 +27,7 @@ export const registerUser = async (firstName, lastName, email, password) => {
   return { user, accessToken, refreshToken };
 };
 
-export const login = async (email, password) => {
+export const login = async ({ email, password }) => {
   const user = await userModel.findOne({ email }).select("+password");
   if (!user) throw new ApiError("Incorrect email or password", 401);
 
@@ -42,7 +47,7 @@ export const login = async (email, password) => {
   return { user, accessToken, refreshToken };
 };
 
-export const refreshAccessToken = async (refreshToken) => {
+export const refreshAccessToken = async ({ refreshToken }) => {
   if (!refreshToken) throw new ApiError("Refresh token is missing", 401);
 
   // The JWT errors was handled in a error-middleware
@@ -63,7 +68,7 @@ export const refreshAccessToken = async (refreshToken) => {
   return accessToken;
 };
 
-export const logout = async (refreshToken) => {
+export const logout = async ({ refreshToken }) => {
   if (!refreshToken) return;
 
   const refreshTokenHash = hashValue(refreshToken);
@@ -74,7 +79,7 @@ export const logout = async (refreshToken) => {
   );
 };
 
-export const forgotPassword = async (email) => {
+export const forgotPassword = async ({ email }) => {
   const user = await userModel.findOne({ email });
 
   if (!user) return;
@@ -105,7 +110,7 @@ export const forgotPassword = async (email) => {
   }
 };
 
-export const verifyResetCode = async (email, resetCode) => {
+export const verifyResetCode = async ({ email, resetCode }) => {
   const { hashedResetCode } = resolveResetCode(resetCode);
 
   const user = await userModel.findOne({
@@ -128,7 +133,7 @@ export const verifyResetCode = async (email, resetCode) => {
   return resetToken;
 };
 
-export const resetPassword = async (resetToken, newPassword) => {
+export const resetPassword = async ({ resetToken, newPassword }) => {
   const resetTokenHash = hashValue(resetToken);
 
   const user = await userModel.findOne({

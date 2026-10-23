@@ -15,14 +15,20 @@ const populateOptions = {
  *@route       GET /api/v1/products/:productId/reviews
  *@access      Public
  */
-export const getReviews = factory.getDocs(reviewService, populateOptions);
+export const getReviews = factory.getDocs({
+  service: reviewService,
+  populateOptions,
+});
 
 /**
  *@desc        Get Specific Review
  *@route       GET /api/v1/reviews/:id
  *@access      Public
  */
-export const getReview = factory.getDoc(reviewService, populateOptions);
+export const getReview = factory.getDoc({
+  service: reviewService,
+  populateOptions,
+});
 
 /**
  *@desc        Create Review
@@ -32,11 +38,11 @@ export const getReview = factory.getDoc(reviewService, populateOptions);
 export const createReview = asyncHandler(async (req, res, next) => {
   const verifiedFields = pickAllowedFields(ALLOWED_REVIEW_FIELDS, req.body);
 
-  const review = await reviewService.create(
-    req.user._id,
-    req.params.productId,
+  const review = await reviewService.create({
+    userId: req.user._id,
+    productId: req.params.productId,
     verifiedFields,
-  );
+  });
 
   res.status(201).json({ status: "success", data: review });
 });
@@ -49,11 +55,11 @@ export const createReview = asyncHandler(async (req, res, next) => {
 export const updateReview = asyncHandler(async (req, res, next) => {
   const verifiedFields = pickAllowedFields(ALLOWED_REVIEW_FIELDS, req.body);
 
-  const review = await reviewService.update(
-    req.user._id,
-    req.params.id,
+  const review = await reviewService.update({
+    userId: req.user._id,
+    reviewId: req.params.id,
     verifiedFields,
-  );
+  });
 
   res.status(200).json({ status: "success", data: review });
 });
@@ -66,7 +72,11 @@ export const updateReview = asyncHandler(async (req, res, next) => {
 export const deleteReview = asyncHandler(async (req, res, next) => {
   const { _id, role } = req.user;
 
-  await reviewService.deleteReview(_id, role, req.params.id);
+  await reviewService.deleteReview({
+    userId: _id,
+    userRole: role,
+    reviewId: req.params.id,
+  });
 
   res.status(204).send();
 });

@@ -22,13 +22,11 @@ const populateOptions = {
  *@access      Public
  */
 export const getProducts = asyncHandler(async (req, res, next) => {
-  const { docs, paginationResult } = await productService.getDocs(
-    req.sanitizedQuery,
-    {
-      select:
-        "title price slug imageCover discountPercentage priceAfterDiscount avgRatings ratingsCount",
-    },
-  );
+  const { docs, paginationResult } = await productService.getDocs({
+    reqQuery: req.sanitizedQuery,
+    select:
+      "title price slug imageCover discountPercentage priceAfterDiscount avgRatings ratingsCount",
+  });
 
   res.status(200).json({
     status: "success",
@@ -46,7 +44,7 @@ export const getProducts = asyncHandler(async (req, res, next) => {
 export const getProduct = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
 
-  const doc = await productService.getDoc(id, { populateOptions });
+  const doc = await productService.getDoc({ id, populateOptions });
 
   res.status(200).json({ status: "success", data: doc });
 });
@@ -109,7 +107,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
  *@access      Private
  */
 export const deleteProduct = asyncHandler(async (req, res, next) => {
-  await productService.del(req.params.productId);
+  await productService.del({ id: req.params.productId });
 
   res.status(204).send();
 });
@@ -122,7 +120,11 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
 export const addProductImage = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
 
-  await productService.addImage(id, req.body.images, req.processedImages);
+  await productService.addImage({
+    id,
+    newImages: req.body.images,
+    processedImages: req.processedImages,
+  });
 
   res.status(204).send();
 });
@@ -135,7 +137,12 @@ export const addProductImage = asyncHandler(async (req, res, next) => {
 export const deleteProductImage = asyncHandler(async (req, res, next) => {
   const { id, imageName } = req.params;
 
-  await productService.deleteImage(id, "images", "products", imageName);
+  await productService.deleteImage({
+    id,
+    imageFieldName: "images",
+    folderName: "products",
+    imageName,
+  });
 
   res.status(204).send();
 });

@@ -13,53 +13,59 @@ import REFRESH_TOKEN_COOKIE_OPTIONS from "../utils/constants/cookie-options.js";
  *@route       GET /api/v1/users
  *@access      Private (admin)
  */
-export const getUsers = factory.getDocs(userService);
+export const getUsers = factory.getDocs({ service: userService });
 
 /**
  *@desc        Get Specific User
  *@route       GET /api/v1/users/:id
  *@access      Private (admin)
  */
-export const getUser = factory.getDoc(userService);
+export const getUser = factory.getDoc({ service: userService });
 
 /**
  *@desc        Get Current User Data
  *@route       GET /api/v1/users/profile
  *@access      Private (protect)
  */
-export const getProfile = factory.getDoc(userService, null, true);
+export const getProfile = factory.getDoc({
+  service: userService,
+  getIdFromUser: true,
+});
 
 /**
  *@desc        Create User (just admin can  create a user with a role)
  *@route       POST /api/v1/users
  *@access      Private (admin)
  */
-export const createUser = factory.create(ADMIN_FIELDS, userService);
+export const createUser = factory.create({
+  fieldsToCreate: ADMIN_FIELDS,
+  service: userService,
+});
 
 /**
  *@desc        Update Specific User (Admin Action)
  *@route       PATCH /api/v1/users/:id
  *@access      Private (admin)
  */
-export const updateUser = factory.update(
-  PROFILE_FIELDS,
-  userService,
-  "profileImage",
-  "users",
-);
+export const updateUser = factory.update({
+  fieldsToUpdate: PROFILE_FIELDS,
+  service: userService,
+  imageField: "profileImage",
+  folderName: "users",
+});
 
 /**
  *@desc        Update Logged User Data (Self)
  *@route       PATCH /api/v1/users/profile-update
  *@access      Private (protect)
  */
-export const updateProfile = factory.update(
-  PROFILE_FIELDS,
-  userService,
-  "profileImage",
-  "users",
-  true,
-);
+export const updateProfile = factory.update({
+  fieldsToUpdate: PROFILE_FIELDS,
+  service: userService,
+  imageField: "profileImage",
+  folderName: "users",
+  getIdFromUser: true,
+});
 
 /**
  *@desc        Update User Role (Admin Action)
@@ -67,7 +73,10 @@ export const updateProfile = factory.update(
  *@access      Private (admin)
  */
 export const updateUserRole = asyncHandler(async (req, res, next) => {
-  const doc = await userService.updateRole(req.params.id, req.body.role);
+  const doc = await userService.updateRole({
+    id: req.params.id,
+    role: req.body.role,
+  });
 
   res.status(200).json({ status: "success", data: doc });
 });
@@ -78,10 +87,10 @@ export const updateUserRole = asyncHandler(async (req, res, next) => {
  *@access      Private (protect)
  */
 export const updateProfilePassword = asyncHandler(async (req, res, next) => {
-  const { accessToken, refreshToken } = await userService.changePassword(
-    req.user._id,
-    req.body,
-  );
+  const { accessToken, refreshToken } = await userService.changePassword({
+    id: req.user._id,
+    reqBody: req.body,
+  });
 
   res.cookie("refreshToken", refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
   res.status(200).json({ status: "success", accessToken });
@@ -93,7 +102,7 @@ export const updateProfilePassword = asyncHandler(async (req, res, next) => {
  *@access      Private (protect)
  */
 export const deactivateProfile = asyncHandler(async (req, res, next) => {
-  await userService.deactivateUser(req.user._id);
+  await userService.deactivateUser({ id: req.user._id });
 
   res.status(204).send();
 });
@@ -105,7 +114,7 @@ export const deactivateProfile = asyncHandler(async (req, res, next) => {
  */
 export const deactivateUser = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  await userService.deactivateUser(id);
+  await userService.deactivateUser({ id });
 
   res.status(204).send();
 });
@@ -115,4 +124,8 @@ export const deactivateUser = asyncHandler(async (req, res, next) => {
  *@route       DELETE /api/v1/users/:id
  *@access      Private (admin)
  */
-export const deleteUser = factory.del(userService, ["profileImage"], "users");
+export const deleteUser = factory.del({
+  service: userService,
+  imageFields: ["profileImage"],
+  folderName: "users",
+});

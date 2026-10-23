@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import userModel from "../../models/user-model.js";
 import ApiError from "../../utils/api-error.js";
 
-export const addAddress = async (userId, address) => {
+export const addAddress = async ({ userId, address }) => {
   const newAddress = { ...address, _id: new mongoose.Types.ObjectId() };
   const doc = await userModel
     .findOneAndUpdate(
@@ -36,7 +36,11 @@ export const addAddress = async (userId, address) => {
   return doc.addresses.id(newAddress._id);
 };
 
-export const updateAddress = async (userId, addressId, fieldsToUpdate = {}) => {
+export const updateAddress = async ({
+  userId,
+  addressId,
+  fieldsToUpdate = {},
+}) => {
   const prefixedFields = Object.fromEntries(
     Object.entries(fieldsToUpdate).map(([key, value]) => [
       `addresses.$.${key}`,
@@ -53,7 +57,7 @@ export const updateAddress = async (userId, addressId, fieldsToUpdate = {}) => {
     throw new ApiError(`No address found with id: ${addressId}`, 404);
 };
 
-export const removeAddress = async (userId, addressId) => {
+export const removeAddress = async ({ userId, addressId }) => {
   const doc = await userModel
     .findOne({
       _id: userId,
@@ -87,7 +91,7 @@ export const removeAddress = async (userId, addressId) => {
     );
 };
 
-export const setDefaultAddress = async (userId, addressId) => {
+export const setDefaultAddress = async ({ userId, addressId }) => {
   const addressObjectId = new mongoose.Types.ObjectId(addressId);
 
   const doc = await userModel.updateOne(

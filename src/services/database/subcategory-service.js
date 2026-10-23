@@ -4,9 +4,9 @@ import * as factory from "./crud-service.js";
 import ApiError from "../../utils/api-error.js";
 import writeProcessedFiles from "../storage/local-storage/write-processed-files.js";
 
-export const getById = factory.getById(subCategoryModel);
-export const getDoc = factory.getDoc(subCategoryModel);
-export const del = factory.del(subCategoryModel);
+export const getById = factory.getById({ Model: subCategoryModel });
+export const getDoc = factory.getDoc({ Model: subCategoryModel });
+export const del = factory.del({ Model: subCategoryModel });
 
 const assertCategoryExists = async (categoryId) => {
   const categoryExists = await Category.exists({ _id: categoryId });
@@ -14,17 +14,17 @@ const assertCategoryExists = async (categoryId) => {
     throw new ApiError(`No category found with id: ${categoryId}`, 404);
 };
 
-export const getDocs = async (reqQuery, reqParams, populateOptions) => {
+export const getDocs = async ({ reqQuery, reqParams, populateOptions }) => {
   await assertCategoryExists(reqParams.categoryId);
 
-  return factory.getDocs(subCategoryModel, "name image slug", "category")(
-    reqQuery,
-    reqParams,
-    populateOptions,
-  );
+  return factory.getDocs({
+    Model: subCategoryModel,
+    defaultFields: "name image slug",
+    nestedFilterField: "category",
+  })({ reqQuery, reqParams, populateOptions });
 };
 
-export const create = async (allowedFields, categoryId, processedImage) => {
+export const create = async ({ allowedFields, categoryId, processedImage }) => {
   await assertCategoryExists(categoryId);
 
   const subCategory = await subCategoryModel.create({
@@ -37,17 +37,17 @@ export const create = async (allowedFields, categoryId, processedImage) => {
   return subCategory;
 };
 
-export const update = async (
+export const update = async ({
   allowedFields,
   subCategoryId,
   categoryId,
   processedImage,
-) => {
+}) => {
   await assertCategoryExists(categoryId);
 
-  return factory.update(subCategoryModel)(
+  return factory.update(subCategoryModel)({
     subCategoryId,
     allowedFields,
     processedImage,
-  );
+  });
 };

@@ -2,7 +2,7 @@ import wishlistModel from "../../models/wishlist-model.js";
 import productModel from "../../models/product-model.js";
 import ApiError from "../../utils/api-error.js";
 
-export const getWishlist = async (userId) => {
+export const getWishlist = async ({ userId }) => {
   const wishlist = await wishlistModel.findOne({ user: userId });
 
   if (!wishlist || !wishlist.products.length)
@@ -46,7 +46,7 @@ export const getWishlist = async (userId) => {
   return wishlist;
 };
 
-export const addProduct = async (userId, productId) => {
+export const addProduct = async ({ userId, productId }) => {
   const productExists = await productModel.exists({ _id: productId });
 
   if (!productExists)
@@ -61,7 +61,7 @@ export const addProduct = async (userId, productId) => {
   return getWishlist(userId);
 };
 
-export const removeProduct = async (userId, productId) => {
+export const removeProduct = async ({ userId, productId }) => {
   const wishlist = await wishlistModel.updateOne(
     {
       user: userId,
