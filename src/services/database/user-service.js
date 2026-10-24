@@ -10,11 +10,11 @@ export const getDocs = factory.getDocs({
   defaultFields:
     "firstName lastName email phone role active profileImage createdAt",
 });
-export const getDoc = factory.getDoc({ Model: userModel });
-export const del = factory.del({ Model: userModel });
-export const getById = factory.getById({ Model: userModel });
-export const create = factory.create({ Model: userModel });
-export const update = factory.update({ Model: userModel });
+export const getDoc = factory.getDoc({ Model: userModel, modelName: "User" });
+export const del = factory.del({ Model: userModel, modelName: "User" });
+export const getById = factory.getById({ Model: userModel, modelName: "User" });
+export const create = factory.create({ Model: userModel, modelName: "User" });
+export const update = factory.update({ Model: userModel, modelName: "User" });
 
 export const updateRole = async ({ id, role }) => {
   const doc = await userModel.findOneAndUpdate(

@@ -8,15 +8,21 @@ export const getDocs = factory.getDocs({
   defaultFields:
     "code discountType discountValue maxDiscount startDate minOrderValue maxUses expire isActive",
 });
-export const getDoc = factory.getDoc({ Model: couponModel });
-export const create = factory.create({ Model: couponModel });
-export const del = factory.del({ Model: couponModel });
+export const getDoc = factory.getDoc({
+  Model: couponModel,
+  modelName: "Coupon",
+});
+export const create = factory.create({
+  Model: couponModel,
+  modelName: "Coupon",
+});
+export const del = factory.del({ Model: couponModel, modelName: "Coupon" });
 
 export const update = async ({ id, fieldsToUpdate }) => {
   const coupon = await couponModel.findById(id);
 
   if (!coupon) {
-    throw new ApiError(`No document found with id: ${id}`, 404);
+    throw new ApiError(`Coupon not found`, 404);
   }
 
   coupon.set(fieldsToUpdate);

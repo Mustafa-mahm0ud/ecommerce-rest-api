@@ -4,14 +4,22 @@ import * as factory from "./crud-service.js";
 import ApiError from "../../utils/api-error.js";
 import writeProcessedFiles from "../storage/local-storage/write-processed-files.js";
 
-export const getById = factory.getById({ Model: subCategoryModel });
-export const getDoc = factory.getDoc({ Model: subCategoryModel });
-export const del = factory.del({ Model: subCategoryModel });
+export const getById = factory.getById({
+  Model: subCategoryModel,
+  modelName: "SubCategory",
+});
+export const getDoc = factory.getDoc({
+  Model: subCategoryModel,
+  modelName: "SubCategory",
+});
+export const del = factory.del({
+  Model: subCategoryModel,
+  modelName: "SubCategory",
+});
 
 const assertCategoryExists = async (categoryId) => {
   const categoryExists = await Category.exists({ _id: categoryId });
-  if (!categoryExists)
-    throw new ApiError(`No category found with id: ${categoryId}`, 404);
+  if (!categoryExists) throw new ApiError(`Category not found`, 404);
 };
 
 export const getDocs = async ({ reqQuery, reqParams, populateOptions }) => {
@@ -45,7 +53,7 @@ export const update = async ({
 }) => {
   await assertCategoryExists(categoryId);
 
-  return factory.update(subCategoryModel)({
+  return factory.update({ Model: subCategoryModel, modelName: "SubCategory" })({
     subCategoryId,
     allowedFields,
     processedImage,

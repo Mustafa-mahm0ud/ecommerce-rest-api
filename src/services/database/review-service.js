@@ -3,7 +3,10 @@ import reviewModel from "../../models/review-model.js";
 import ApiError from "../../utils/api-error.js";
 import * as factory from "./crud-service.js";
 
-export const getDoc = factory.getDoc({ Model: reviewModel });
+export const getDoc = factory.getDoc({
+  Model: reviewModel,
+  modelName: "Review",
+});
 
 export const getDocs = async ({ reqQuery, reqParams, populateOptions }) => {
   const { productId } = reqParams;
@@ -12,7 +15,7 @@ export const getDocs = async ({ reqQuery, reqParams, populateOptions }) => {
 
   if (!product) throw new ApiError(`Product not found`, 404);
 
-  return factory.getDocs(reviewModel, "", "product")(
+  return factory.getDocs({ Model: reviewModel, defaultFields: "product" })(
     reqQuery,
     reqParams,
     populateOptions,
