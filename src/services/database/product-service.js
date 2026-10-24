@@ -61,18 +61,16 @@ export const validateProductData = async ({
   }
 };
 
-export const getDocs = async ({
-  sanitizedQuery,
-  includeDeleted = false,
-  select,
-}) => {
+export const getDocs = async ({ sanitizedQuery, includeDeleted = false }) => {
   const filter = includeDeleted ? {} : { isDeleted: false };
 
   const apiFeatures = new ApiFeatures(productModel.find(filter), sanitizedQuery)
     .filtering()
     .search()
     .sort()
-    .limitFields(select)
+    .limitFields(
+      "title price slug imageCover discountPercentage priceAfterDiscount avgRatings ratingsCount",
+    )
     .paginate();
 
   const { mongooseQuery, filterQuery } = apiFeatures;
