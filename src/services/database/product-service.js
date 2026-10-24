@@ -7,10 +7,22 @@ import * as factory from "./crud-service.js";
 import ApiFeatures from "../../utils/api-features.js";
 import ApiError from "../../utils/api-error.js";
 
-export const getById = factory.getById(productModel);
-export const hardDelete = factory.del(productModel);
-export const addImage = factory.addImage(productModel);
-export const deleteImage = factory.deleteImage(productModel);
+export const getById = factory.getById({
+  Model: productModel,
+  modelName: "Product",
+});
+export const hardDelete = factory.del({
+  Model: productModel,
+  modelName: "Product",
+});
+export const addImage = factory.addImage({
+  Model: productModel,
+  modelName: "Product",
+});
+export const deleteImage = factory.deleteImage({
+  Model: productModel,
+  modelName: "Product",
+});
 
 export const validateProductData = async ({
   category,
