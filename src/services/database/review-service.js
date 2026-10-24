@@ -8,7 +8,11 @@ export const getDoc = factory.getDoc({
   modelName: "Review",
 });
 
-export const getDocs = async ({ reqQuery, reqParams, populateOptions }) => {
+export const getDocs = async ({
+  sanitizedQuery,
+  reqParams,
+  populateOptions,
+}) => {
   const { productId } = reqParams;
 
   const product = await Product.exists({ _id: productId });
@@ -16,7 +20,7 @@ export const getDocs = async ({ reqQuery, reqParams, populateOptions }) => {
   if (!product) throw new ApiError(`Product not found`, 404);
 
   return factory.getDocs({ Model: reviewModel, defaultFields: "product" })(
-    reqQuery,
+    sanitizedQuery,
     reqParams,
     populateOptions,
   );

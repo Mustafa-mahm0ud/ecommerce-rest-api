@@ -14,14 +14,14 @@ export const getById =
 
 export const getDocs =
   ({ Model, defaultFields = "", nestedFilterField = null }) =>
-  async ({ reqQuery, reqParams = {}, populateOptions = null }) => {
+  async ({ sanitizedQuery, reqParams = {}, populateOptions = null }) => {
     const nestedId = nestedFilterField
       ? reqParams[`${nestedFilterField}Id`]
       : null;
 
     const baseFilter = nestedId ? { [nestedFilterField]: nestedId } : {};
 
-    const apiFeatures = new ApiFeatures(Model.find(baseFilter), reqQuery)
+    const apiFeatures = new ApiFeatures(Model.find(baseFilter), sanitizedQuery)
       .filtering()
       .search()
       .sort()
@@ -44,10 +44,10 @@ export const getDocs =
 
 export const getDoc =
   ({ Model, modelName = "Document", defaultFields = "" }) =>
-  async ({ id, reqQuery, populateOptions }) => {
+  async ({ id, sanitizedQuery, populateOptions }) => {
     const apiFeatures = new ApiFeatures(
       Model.findOne({ _id: id }),
-      reqQuery,
+      sanitizedQuery,
     ).limitFields(defaultFields);
 
     if (populateOptions) apiFeatures.customPopulate(populateOptions);

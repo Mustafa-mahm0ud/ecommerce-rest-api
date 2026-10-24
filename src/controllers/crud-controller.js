@@ -6,7 +6,7 @@ import * as deleteLocalFiles from "../services/storage/local-storage/delete-file
 export const getDocs = ({ service, populateOptions }) =>
   asyncHandler(async (req, res, next) => {
     const { docs, paginationResult } = await service.getDocs({
-      reqQuery: req.sanitizedQuery,
+      sanitizedQuery: req.sanitizedQuery,
       reqParams: req.params,
       populateOptions,
     });
@@ -24,7 +24,7 @@ export const getDoc = ({ service, populateOptions, getIdFromUser = false }) =>
 
     const doc = await service.getDoc({
       id,
-      reqQuery: req.sanitizedQuery,
+      sanitizedQuery: req.sanitizedQuery,
       populateOptions,
     });
 

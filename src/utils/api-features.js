@@ -17,14 +17,14 @@ const prefixOperators = (obj) => {
 };
 
 export default class ApiFeatures {
-  constructor(mongooseQuery, reqQuery) {
+  constructor(mongooseQuery, sanitizedQuery) {
     this.mongooseQuery = mongooseQuery;
-    this.reqQuery = reqQuery;
+    this.sanitizedQuery = sanitizedQuery;
     this.filterQuery = {};
   }
 
   filtering(allowedFields = []) {
-    let queryObj = { ...this.reqQuery };
+    let queryObj = { ...this.sanitizedQuery };
 
     const excludeFields = ["sort", "limit", "page", "keyword", "fields"];
     excludeFields.forEach((el) => delete queryObj[el]);
@@ -44,7 +44,7 @@ export default class ApiFeatures {
   }
 
   search() {
-    const keyword = this.reqQuery?.keyword?.trim();
+    const keyword = this.sanitizedQuery?.keyword?.trim();
 
     if (keyword) {
       const searchCondition = { $text: { $search: keyword } };
@@ -56,7 +56,7 @@ export default class ApiFeatures {
   }
 
   sort() {
-    const sortParam = this.reqQuery?.sort;
+    const sortParam = this.sanitizedQuery?.sort;
 
     if (sortParam) {
       const sortBy = sortParam
@@ -65,14 +65,14 @@ export default class ApiFeatures {
         .join(" ");
 
       this.mongooseQuery.sort(sortBy);
-    } else if (!this.reqQuery?.keyword) {
+    } else if (!this.sanitizedQuery?.keyword) {
       this.mongooseQuery.sort("-createdAt");
     }
     return this;
   }
 
   limitFields(defaultFields = "") {
-    const fieldsParam = this.reqQuery?.fields;
+    const fieldsParam = this.sanitizedQuery?.fields;
 
     if (fieldsParam) {
       const fields = fieldsParam
@@ -88,10 +88,10 @@ export default class ApiFeatures {
   }
 
   paginate() {
-    let page = parseInt(this.reqQuery.page, 10);
+    let page = parseInt(this.sanitizedQuery.page, 10);
     if (!Number.isInteger(page) || page < 1) page = 1;
 
-    let limit = parseInt(this.reqQuery.limit, 10);
+    let limit = parseInt(this.sanitizedQuery.limit, 10);
     if (!Number.isInteger(limit) || limit < 1) limit = 5;
     if (limit > 100) limit = 100;
 
@@ -125,7 +125,8 @@ export default class ApiFeatures {
     const fieldName = Object.values(populateOptions)[0];
 
     const shouldPopulate =
-      !this.reqQuery.fields || this.reqQuery.fields.includes(fieldName);
+      !this.sanitizedQuery.fields ||
+      this.sanitizedQuery.fields.includes(fieldName);
 
     if (shouldPopulate) {
       this.mongooseQuery.populate(populateOptions);

@@ -61,10 +61,14 @@ export const validateProductData = async ({
   }
 };
 
-export const getDocs = async ({ reqQuery, includeDeleted = false, select }) => {
+export const getDocs = async ({
+  sanitizedQuery,
+  includeDeleted = false,
+  select,
+}) => {
   const filter = includeDeleted ? {} : { isDeleted: false };
 
-  const apiFeatures = new ApiFeatures(productModel.find(filter), reqQuery)
+  const apiFeatures = new ApiFeatures(productModel.find(filter), sanitizedQuery)
     .filtering()
     .search()
     .sort()

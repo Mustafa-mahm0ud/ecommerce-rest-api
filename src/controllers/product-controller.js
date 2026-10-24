@@ -23,7 +23,7 @@ const populateOptions = {
  */
 export const getProducts = asyncHandler(async (req, res, next) => {
   const { docs, paginationResult } = await productService.getDocs({
-    reqQuery: req.sanitizedQuery,
+    sanitizedQuery: req.sanitizedQuery,
     select:
       "title price slug imageCover discountPercentage priceAfterDiscount avgRatings ratingsCount",
   });

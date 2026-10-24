@@ -22,14 +22,18 @@ const assertCategoryExists = async (categoryId) => {
   if (!categoryExists) throw new ApiError(`Category not found`, 404);
 };
 
-export const getDocs = async ({ reqQuery, reqParams, populateOptions }) => {
+export const getDocs = async ({
+  sanitizedQuery,
+  reqParams,
+  populateOptions,
+}) => {
   await assertCategoryExists(reqParams.categoryId);
 
   return factory.getDocs({
     Model: subCategoryModel,
     defaultFields: "name image slug",
     nestedFilterField: "category",
-  })({ reqQuery, reqParams, populateOptions });
+  })({ sanitizedQuery, reqParams, populateOptions });
 };
 
 export const create = async ({ allowedFields, categoryId, processedImage }) => {
