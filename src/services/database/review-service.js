@@ -10,8 +10,7 @@ export const getDocs = async ({ reqQuery, reqParams, populateOptions }) => {
 
   const product = await Product.exists({ _id: productId });
 
-  if (!product)
-    throw new ApiError(`No product found with id: ${productId}`, 404);
+  if (!product) throw new ApiError(`Product not found`, 404);
 
   return factory.getDocs(reviewModel, "", "product")(
     reqQuery,
@@ -22,8 +21,7 @@ export const getDocs = async ({ reqQuery, reqParams, populateOptions }) => {
 
 export const create = async ({ userId, productId, verifiedFields }) => {
   const product = await Product.exists({ _id: productId });
-  if (!product)
-    throw new ApiError(`No product found with id: ${productId}`, 404);
+  if (!product) throw new ApiError(`Product not found`, 404);
 
   return reviewModel.create({
     ...verifiedFields,
@@ -38,11 +36,7 @@ export const update = async ({ userId, reviewId, verifiedFields }) => {
     user: userId,
   });
 
-  if (!userReview)
-    throw new ApiError(
-      `No review found with id '${reviewId}' for this user`,
-      404,
-    );
+  if (!userReview) throw new ApiError(`Review not found`, 404);
 
   Object.assign(userReview, verifiedFields);
 
@@ -56,9 +50,5 @@ export const deleteReview = async ({ userId, userRole, reviewId }) => {
     userRole === "admin" ? { _id: reviewId } : { _id: reviewId, user: userId };
 
   const review = await reviewModel.findOneAndDelete(filter);
-  if (!review)
-    throw new ApiError(
-      `No review found with id '${reviewId}' for this user`,
-      404,
-    );
+  if (!review) throw new ApiError(`Review not found`, 404);
 };

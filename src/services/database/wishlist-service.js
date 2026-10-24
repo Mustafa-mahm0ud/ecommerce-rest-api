@@ -49,8 +49,7 @@ export const getWishlist = async ({ userId }) => {
 export const addProduct = async ({ userId, productId }) => {
   const productExists = await productModel.exists({ _id: productId });
 
-  if (!productExists)
-    throw new ApiError(`No product found with id ${productId}`, 404);
+  if (!productExists) throw new ApiError(`Product not found`, 404);
 
   await wishlistModel.updateOne(
     { user: userId },
@@ -70,6 +69,5 @@ export const removeProduct = async ({ userId, productId }) => {
     { $pull: { products: productId } },
   );
 
-  if (wishlist.matchedCount === 0)
-    throw new ApiError(`Product '${productId}' not found in wishlist`, 404);
+  if (wishlist.matchedCount === 0) throw new ApiError(`Product not found`, 404);
 };

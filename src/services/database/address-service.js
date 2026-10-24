@@ -31,7 +31,7 @@ export const addAddress = async ({ userId, address }) => {
     )
     .select("-_id addresses");
 
-  if (!doc) throw new ApiError(`No user found with id: ${userId}`, 404);
+  if (!doc) throw new ApiError(`User not found`, 404);
 
   return doc.addresses.id(newAddress._id);
 };
@@ -53,8 +53,7 @@ export const updateAddress = async ({
     { $set: prefixedFields },
   );
 
-  if (doc.matchedCount === 0)
-    throw new ApiError(`No address found with id: ${addressId}`, 404);
+  if (doc.matchedCount === 0) throw new ApiError(`Address not found`, 404);
 };
 
 export const removeAddress = async ({ userId, addressId }) => {
@@ -65,7 +64,7 @@ export const removeAddress = async ({ userId, addressId }) => {
     })
     .select("addresses.$");
 
-  if (!doc) throw new ApiError(`No address found with id: ${addressId}`, 404);
+  if (!doc) throw new ApiError(`Address not found`, 404);
 
   // Just keep it to provide query
   if (doc.addresses[0].isDefault)
@@ -117,6 +116,5 @@ export const setDefaultAddress = async ({ userId, addressId }) => {
     { updatePipeline: true },
   );
 
-  if (doc.matchedCount === 0)
-    throw new ApiError(`No address found with id: ${addressId}`, 404);
+  if (doc.matchedCount === 0) throw new ApiError(`Address not found`, 404);
 };

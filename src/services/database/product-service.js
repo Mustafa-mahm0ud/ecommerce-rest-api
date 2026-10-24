@@ -32,7 +32,7 @@ export const validateProductData = async ({
   if (category) {
     const categoryExist = await categoryModel.exists({ _id: category });
     if (!categoryExist) {
-      throw new ApiError(`No category found with id: ${category}`, 400);
+      throw new ApiError(`Category not found`, 404);
     }
   }
 
@@ -54,7 +54,7 @@ export const validateProductData = async ({
 
     if (count !== subCategoriesIds.length) {
       throw new ApiError(
-        `Some subCategories don't exist or don't belong to this category: ${targetCategory}`,
+        `Some subCategories don't exist or don't belong to product category`,
         400,
       );
     }
@@ -97,8 +97,7 @@ export const getDoc = async ({
 
   const product = await query;
 
-  if (!product)
-    throw new ApiError(`No document found with id: ${productId}`, 404);
+  if (!product) throw new ApiError(`Product not found`, 404);
 
   return product;
 };

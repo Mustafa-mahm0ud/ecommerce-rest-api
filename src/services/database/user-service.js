@@ -23,7 +23,7 @@ export const updateRole = async ({ id, role }) => {
     { returnDocument: "after", runValidators: true },
   );
 
-  if (!doc) throw new ApiError(`No user found with id: ${id}`, 404);
+  if (!doc) throw new ApiError(`user not found`, 404);
 
   return doc;
 };
@@ -33,7 +33,7 @@ export const changePassword = async ({ id, reqBody }) => {
 
   const user = await userModel.findOne({ _id: id }).select("+password");
 
-  if (!user) throw new ApiError(`No user found with id: ${id}`, 404);
+  if (!user) throw new ApiError(`User not found`, 404);
 
   const correctPassword = await bcrypt.compare(currentPassword, user.password);
 
@@ -54,5 +54,5 @@ export const deactivateUser = async ({ id }) => {
     { active: false },
     { returnDocument: "after" },
   );
-  if (!doc) throw new ApiError(`No user found with id: ${id}`, 404);
+  if (!doc) throw new ApiError(`User not found`, 404);
 };
