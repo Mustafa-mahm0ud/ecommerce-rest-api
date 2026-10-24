@@ -6,7 +6,6 @@ import {
   PROFILE_FIELDS,
   ADMIN_FIELDS,
 } from "../utils/constants/user-fields.js";
-import REFRESH_TOKEN_COOKIE_OPTIONS from "../utils/constants/cookie-options.js";
 
 /**
  *@desc        Get Users
@@ -87,13 +86,12 @@ export const updateUserRole = asyncHandler(async (req, res, next) => {
  *@access      Private (protect)
  */
 export const updateProfilePassword = asyncHandler(async (req, res, next) => {
-  const { accessToken, refreshToken } = await userService.changePassword({
+  await userService.changePassword({
     id: req.user._id,
     reqBody: req.body,
   });
 
-  res.cookie("refreshToken", refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
-  res.status(200).json({ accessToken });
+  res.sendStatus(204);
 });
 
 /**

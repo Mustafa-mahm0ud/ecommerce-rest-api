@@ -2,7 +2,6 @@ import bcrypt from "bcryptjs";
 
 import userModel from "../../models/user-model.js";
 import * as factory from "./crud-service.js";
-import issueTokens from "./token-service.js";
 import ApiError from "../../utils/api-error.js";
 
 export const getDocs = factory.getDocs({
@@ -44,8 +43,6 @@ export const changePassword = async ({ id, reqBody }) => {
   user.loggedOutAt = Date.now();
 
   await user.save();
-
-  return issueTokens(user);
 };
 
 export const deactivateUser = async ({ id }) => {
