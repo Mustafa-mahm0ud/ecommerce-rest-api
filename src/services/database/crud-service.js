@@ -13,8 +13,8 @@ export const getById =
   };
 
 export const getDocs =
-  ({ Model, defaultFields = "", nestedFilterField = null }) =>
-  async ({ sanitizedQuery, reqParams = {}, populateOptions = null }) => {
+  ({ Model, defaultFields, nestedFilterField }) =>
+  async ({ sanitizedQuery, reqParams, populateOptions }) => {
     const nestedId = nestedFilterField
       ? reqParams[`${nestedFilterField}Id`]
       : null;
@@ -43,16 +43,16 @@ export const getDocs =
   };
 
 export const getDoc =
-  ({ Model, modelName = "Document", defaultFields = "" }) =>
-  async ({ id, sanitizedQuery, populateOptions }) => {
-    const apiFeatures = new ApiFeatures(
-      Model.findOne({ _id: id }),
-      sanitizedQuery,
-    ).limitFields(defaultFields);
+  ({ Model, modelName = "Document", defaultFields }) =>
+  async ({ id, populateOptions }) => {
+    const query = Model.findOne({ _id: id });
 
-    if (populateOptions) apiFeatures.customPopulate(populateOptions);
+    if (populateOptions) query.customPopulate(populateOptions);
 
-    const doc = await apiFeatures.mongooseQuery;
+    if (defaultFields) query.select(defaultFields);
+
+    const doc = await query;
+
     if (!doc) throw new ApiError(`${modelName} not found`, 404);
 
     return doc;
