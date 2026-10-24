@@ -4,7 +4,7 @@ import writeProcessedFiles from "../storage/local-storage/write-processed-files.
 import { deleteImageFile } from "../storage/local-storage/delete-files.js";
 
 export const getById =
-  ({ Model }) =>
+  ({ Model, modelName = "Document" }) =>
   async ({ id, fields = "" }) => {
     const doc = await Model.findById(id).select(fields);
     if (!doc) throw new ApiError(`${modelName} not found`, 404);
