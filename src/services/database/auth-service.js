@@ -38,7 +38,7 @@ export const login = async ({ email, password }) => {
   if (!user.active)
     throw new ApiError("This account has been deactivated", 401);
 
-  if (user.passwordResetCode) {
+  if (user.passwordResetHashCode) {
     clearPasswordResetFields(user);
     await user.save();
   }
@@ -86,9 +86,9 @@ export const forgotPassword = async ({ email }) => {
 
   const { resetCode, hashedResetCode } = resolveResetCode();
 
-  user.passwordResetCode = hashedResetCode;
+  user.passwordResetHashCode = hashedResetCode;
   user.passwordResetExpires = getResetExpiration();
-  user.passwordResetTokenHash = undefined;
+  user.passwordResetHashToken = undefined;
   user.passwordResetTokenExpires = undefined;
 
   await user.save();
@@ -115,7 +115,7 @@ export const verifyResetCode = async ({ email, resetCode }) => {
 
   const user = await userModel.findOne({
     email,
-    passwordResetCode: hashedResetCode,
+    passwordResetHashCode: hashedResetCode,
     passwordResetExpires: { $gt: Date.now() },
   });
 
@@ -123,9 +123,9 @@ export const verifyResetCode = async ({ email, resetCode }) => {
 
   const { resetToken, resetTokenHash } = generateResetToken();
 
-  user.passwordResetTokenHash = resetTokenHash;
+  user.passwordResetHashToken = resetTokenHash;
   user.passwordResetTokenExpires = getResetExpiration();
-  user.passwordResetCode = undefined;
+  user.passwordResetHashCode = undefined;
   user.passwordResetExpires = undefined;
 
   await user.save();
@@ -137,7 +137,7 @@ export const resetPassword = async ({ resetToken, newPassword }) => {
   const resetTokenHash = hashValue(resetToken);
 
   const user = await userModel.findOne({
-    passwordResetTokenHash: resetTokenHash,
+    passwordResetHashToken: resetTokenHash,
     passwordResetTokenExpires: { $gt: Date.now() },
   });
 

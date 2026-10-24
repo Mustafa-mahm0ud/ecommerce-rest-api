@@ -1,7 +1,7 @@
 const clearPasswordResetFields = (user) => {
-  user.passwordResetCode = undefined;
+  user.passwordResetHashCode = undefined;
   user.passwordResetExpires = undefined;
-  user.passwordResetTokenHash = undefined;
+  user.passwordResetHashToken = undefined;
   user.passwordResetTokenExpires = undefined;
 };
 

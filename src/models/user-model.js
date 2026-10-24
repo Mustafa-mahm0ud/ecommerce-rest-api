@@ -51,9 +51,9 @@ const UserSchema = new mongoose.Schema(
       default: [],
     },
     passwordChangedAt: Date,
-    passwordResetCode: String,
+    passwordResetHashCode: String,
     passwordResetExpires: Date,
-    passwordResetTokenHash: String,
+    passwordResetHashToken: String,
     passwordResetTokenExpires: Date,
     refreshTokenHash: {
       type: String,
@@ -77,7 +77,7 @@ const UserSchema = new mongoose.Schema(
       transform(doc, ret) {
         delete ret.password;
         delete ret.passwordChangedAt;
-        delete ret.passwordResetCode;
+        delete ret.passwordResetHashCode;
         delete ret.passwordResetExpires;
         delete ret.passwordResetVerified;
         delete ret.refreshTokenHash;
