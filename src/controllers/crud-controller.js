@@ -24,7 +24,6 @@ export const getDoc = ({ service, populateOptions, getIdFromUser = false }) =>
 
     const doc = await service.getDoc({
       id,
-      sanitizedQuery: req.sanitizedQuery,
       populateOptions,
     });
 
