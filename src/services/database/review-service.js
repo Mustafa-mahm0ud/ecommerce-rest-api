@@ -19,7 +19,7 @@ export const getDocs = async ({
 
   if (!product) throw new ApiError(`Product not found`, 404);
 
-  return factory.getDocs({ Model: reviewModel, defaultFields: "product" })(
+  return factory.getDocs({ Model: reviewModel, nestedFilterField: "product" })(
     sanitizedQuery,
     reqParams,
     populateOptions,
