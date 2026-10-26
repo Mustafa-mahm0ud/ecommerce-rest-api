@@ -1,87 +1,91 @@
-import path from "path";
-import { fileURLToPath } from "url";
-
 import "dotenv/config";
-import morgan from "morgan";
-import express from "express";
-import helmet from "helmet";
-import cookieParser from "cookie-parser";
+import mongoose from "mongoose";
 
+import app from "./app.js";
 import connectDB from "./config/mongodb.js";
-import errorHandler from "./middlewares/error-middleware.js";
-import ApiError from "./utils/api-error.js";
-import mountRoutes from "./routes/mount-routes.js";
-import sanitizeMiddleware from "./middlewares/sanitize-middleware.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const REQUIRED_ENV = [
+  "DB_URI",
+  "JWT_SECRET_KEY",
+  "JWT_EXPIRE_TIME",
+  "JWT_REFRESH_SECRET_KEY",
+  "JWT_REFRESH_EXPIRE_TIME",
+];
 
-// app
-const app = express();
-
-// MiddleWare
-app.use(express.json());
-app.use(helmet());
-app.use(cookieParser());
-app.set("query parser", "extended");
-app.use(sanitizeMiddleware);
-app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
-
-const { NODE_ENV } = process.env;
-if (NODE_ENV === "development") {
-  app.use(morgan("dev"));
-  console.log(`mode: '${NODE_ENV}'`);
-} else {
-  app.use(morgan("tiny"));
-  console.log(`Mode: '${NODE_ENV}'`);
+// The server does not start when any required environment key is missing
+const missingEnv = REQUIRED_ENV.filter((key) => !process.env[key]);
+if (missingEnv.length > 0) {
+  console.error(`Missing required env variables: ${missingEnv.join(", ")}`);
+  process.exit(1);
 }
 
-// Mount middleware
-mountRoutes(app);
+const { NODE_ENV } = process.env;
+const PORT = process.env.PORT || 8000;
+const SHUTDOWN_TIMEOUT_MS = 10_000;
 
-app.all(/.*/, (req, res, next) =>
-  next(new ApiError(`Can't find this route ${req.originalUrl}`, 404)),
+let server;
+let isShuttingDown = false;
+
+// Close listening to server and Mongo connection
+const shutdown = async (exitCode) => {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
+  setTimeout(() => {
+    console.error("Shutdown timed out, forcing exit");
+    process.exit(exitCode);
+  }, SHUTDOWN_TIMEOUT_MS).unref();
+
+  try {
+    if (server?.listening) {
+      await new Promise((resolve) => {
+        server.close(resolve);
+      });
+    }
+    await mongoose.connection.close();
+  } catch (err) {
+    console.error(`Error during shutdown: ${err.message}`);
+  } finally {
+    process.exit(exitCode);
+  }
+};
+
+// When a promise is rejected and not catch
+process.on("unhandledRejection", (reason) => {
+  console.error(
+    "Unhandled Rejection:",
+    reason instanceof Error ? reason.stack : reason,
+  );
+  shutdown(1);
+});
+
+// throw error and not catch
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err.stack);
+  shutdown(1);
+});
+
+// When closed the server like ctrl+c and docker close
+["SIGTERM", "SIGINT"].forEach((signal) =>
+  process.on(signal, () => {
+    console.log(`${signal} received. Shutting down gracefully...`);
+    shutdown(0);
+  }),
 );
-
-app.use(errorHandler);
-
-// DB connection and start server
-const { PORT } = process.env;
 
 const startServer = async () => {
   try {
     await connectDB();
 
-    const server = app.listen(PORT, () =>
-      console.log(`App running in PORT: ${PORT}`),
-    );
+    server = app.listen(PORT);
 
-    process.on("unhandledRejection", (err) => {
-      console.error(
-        `Unhandled Rejection: ${err.name} | ${err.message}\n${err.stack}`,
-      );
-      server.close(() => {
-        console.error("Shutting Down due to unhandled rejection...");
-        process.exit(1);
-      });
+    server.on("error", (err) => {
+      console.error(`Failed to start server: ${err.message}`);
+      shutdown(1);
     });
 
-    process.on("uncaughtException", (err) => {
-      console.error(
-        `Uncaught Exception: ${err.name} | ${err.message}\n${err.stack}`,
-      );
-      server.close(() => {
-        console.error("Shutting Down due to uncaught exception...");
-        process.exit(1);
-      });
-    });
-
-    process.on("SIGTERM", () => {
-      console.log("SIGTERM received. Shutting down gracefully...");
-      server.close(() => {
-        console.log("Process terminated.");
-        process.exit(0);
-      });
+    server.on("listening", () => {
+      console.log(`App running on port ${PORT} (mode: ${NODE_ENV})`);
     });
   } catch (err) {
     console.error(`Connection error: ${err.message}`);
