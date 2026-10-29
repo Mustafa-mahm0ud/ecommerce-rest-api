@@ -112,7 +112,7 @@ const brandValidator = () =>
   body("brand").optional().isMongoId().withMessage("Invalid brand id format");
 
 export const getProductValidator = [
-  param("id").isMongoId().withMessage("Invalid product id format"),
+  param("productId").isMongoId().withMessage("Invalid product id format"),
 
   validatorMiddleware,
 ];
@@ -146,7 +146,7 @@ export const createProductValidator = [
 ];
 
 export const updateProductValidator = [
-  param("id").isMongoId().withMessage("Invalid product id format"),
+  param("productId").isMongoId().withMessage("Invalid product id format"),
 
   requireAtLeastOneField(ALLOWED_PRODUCT_UPDATE_FIELDS),
 

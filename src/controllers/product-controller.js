@@ -39,9 +39,10 @@ export const getProducts = asyncHandler(async (req, res, next) => {
  *@access      Public
  */
 export const getProduct = asyncHandler(async (req, res, next) => {
-  const { productId } = req.params;
-
-  const doc = await productService.getDoc({ productId, populateOptions });
+  const doc = await productService.getDoc({
+    productId: req.params.productId,
+    populateOptions,
+  });
 
   res.status(200).json({ data: doc });
 });
@@ -84,18 +85,17 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
   const doc = await productService.update({
     productId: req.params.productId,
     fieldsToUpdate,
-    currentProduct: req.currentProduct,
     processedImage: req.processedImage,
   });
 
   res.status(200).json({ data: doc });
 
-  res.on("finish", () => {
-    const oldValue = req.currentProduct.imageCover;
-    const newValue = doc.imageCover;
+  // res.on("finish", () => {
+  //   const oldValue = req.currentProduct.imageCover;
+  //   const newValue = doc.imageCover;
 
-    deleteOldSingleImage(oldValue, newValue, "products");
-  });
+  //   deleteOldSingleImage(oldValue, newValue, "products");
+  // });
 });
 
 /**
@@ -115,10 +115,8 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
  *@access       Private
  */
 export const addProductImage = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-
   await productService.addImage({
-    id,
+    id: req.params.productId,
     newImages: req.body.images,
     processedImages: req.processedImages,
   });
@@ -132,10 +130,10 @@ export const addProductImage = asyncHandler(async (req, res, next) => {
  *@access       Private
  */
 export const deleteProductImage = asyncHandler(async (req, res, next) => {
-  const { id, imageName } = req.params;
+  const { productId, imageName } = req.params;
 
   await productService.deleteImage({
-    id,
+    id: productId,
     imageFieldName: "images",
     folderName: "products",
     imageName,
