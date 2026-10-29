@@ -4,7 +4,7 @@ import * as authMiddleware from "../middlewares/auth-middleware.js";
 import * as multerUploadMiddleware from "../middlewares/multer-upload-middleware.js";
 import * as localUploadMiddleware from "../middlewares/local-upload-middleware.js";
 import * as productController from "../controllers/product-controller.js";
-import * as productValidator from "../utils/validators/product-validator.js";
+import * as productValidator from "../validators/product-validator.js";
 import { nestedReviewRouter } from "./review-route.js";
 import variantRouter from "./variant-route.js";
 import parseVariants from "../middlewares/parse-variants-middleware.js";

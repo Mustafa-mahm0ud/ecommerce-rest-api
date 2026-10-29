@@ -1,7 +1,7 @@
 import express from "express";
 
 import { protect } from "../middlewares/auth-middleware.js";
-import * as addressValidator from "../utils/validators/address-validator.js";
+import * as addressValidator from "../validators/address-validator.js";
 import * as addressController from "../controllers/address-controller.js";
 
 const router = express.Router();

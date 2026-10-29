@@ -3,7 +3,7 @@ import express from "express";
 import * as authMiddleware from "../middlewares/auth-middleware.js";
 import * as multerUploadMiddleware from "../middlewares/multer-upload-middleware.js";
 import * as localUploadMiddleware from "../middlewares/local-upload-middleware.js";
-import * as subCategoryValidator from "../utils/validators/subcategory-validator.js";
+import * as subCategoryValidator from "../validators/subcategory-validator.js";
 import * as subCategoryController from "../controllers/subcategory-controller.js";
 
 const uploadCoverImage = multerUploadMiddleware.uploadSingleImage("image");

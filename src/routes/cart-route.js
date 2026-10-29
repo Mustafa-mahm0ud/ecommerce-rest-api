@@ -2,7 +2,7 @@
 import express from "express";
 import * as authMiddleware from "../middlewares/auth-middleware.js";
 import * as cartController from "../controllers/cart-controller.js";
-import * as cartValidator from "../utils/validators/cart-validator.js";
+import * as cartValidator from "../validators/cart-validator.js";
 
 const router = express.Router();
 

@@ -2,7 +2,7 @@ import express from "express";
 
 import * as authMiddleware from "../middlewares/auth-middleware.js";
 import * as wishlistController from "../controllers/wishlist-controller.js";
-import * as wishlistValidator from "../utils/validators/wishlist-validator.js";
+import * as wishlistValidator from "../validators/wishlist-validator.js";
 
 const router = express.Router();
 

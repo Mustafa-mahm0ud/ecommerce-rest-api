@@ -1,9 +1,9 @@
 import { param, body } from "express-validator";
 
-import ALLOWED_ADDRESS_FIELDS from "../constants/address-fields.js";
-import requireAtLeastOneField from "../require-at-least-one-field.js";
-import requiredOrOptional from "../../helpers/required-or-optional.js";
-import validatorMiddleware from "../../middlewares/validator-middleware.js";
+import ALLOWED_ADDRESS_FIELDS from "../utils/constants/address-fields.js";
+import requireAtLeastOneField from "../utils/require-at-least-one-field.js";
+import requiredOrOptional from "../helpers/required-or-optional.js";
+import validatorMiddleware from "../middlewares/validator-middleware.js";
 
 const aliasValidator = (isRequired = false) =>
   requiredOrOptional("alias", isRequired, "You must enter the alias")

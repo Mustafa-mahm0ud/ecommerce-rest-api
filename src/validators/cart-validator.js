@@ -1,5 +1,5 @@
 import { param, body } from "express-validator";
-import validatorMiddleware from "../../middlewares/validator-middleware.js";
+import validatorMiddleware from "../middlewares/validator-middleware.js";
 
 const mongoIdParam = (name) =>
   param(name).isMongoId().withMessage(`Invalid ${name}`);

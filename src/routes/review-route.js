@@ -2,7 +2,7 @@ import express from "express";
 
 import * as authMiddleware from "../middlewares/auth-middleware.js";
 import * as reviewController from "../controllers/review-controller.js";
-import * as reviewValidator from "../utils/validators/review-validator.js";
+import * as reviewValidator from "../validators/review-validator.js";
 
 /**
  *@desc        It is only used with nested route

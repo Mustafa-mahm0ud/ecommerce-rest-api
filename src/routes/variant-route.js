@@ -2,7 +2,7 @@ import express from "express";
 
 import * as authMiddleware from "../middlewares/auth-middleware.js";
 import * as variantController from "../controllers/variant-controller.js";
-import * as variantValidator from "../utils/validators/variant-validator.js";
+import * as variantValidator from "../validators/variant-validator.js";
 
 const router = express.Router({ mergeParams: true });
 

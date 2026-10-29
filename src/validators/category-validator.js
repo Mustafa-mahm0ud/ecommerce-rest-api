@@ -1,9 +1,9 @@
 import { param } from "express-validator";
 
-import ALLOWED_CATEGORY_FIELDS from "../constants/category-fields.js";
-import requireAtLeastOneField from "../require-at-least-one-field.js";
-import requiredOrOptional from "../../helpers/required-or-optional.js";
-import validatorMiddleware from "../../middlewares/validator-middleware.js";
+import ALLOWED_CATEGORY_FIELDS from "../utils/constants/category-fields.js";
+import requireAtLeastOneField from "../utils/require-at-least-one-field.js";
+import requiredOrOptional from "../helpers/required-or-optional.js";
+import validatorMiddleware from "../middlewares/validator-middleware.js";
 
 const nameValidator = (isRequired = false) =>
   requiredOrOptional("name", isRequired, "You must enter the name")

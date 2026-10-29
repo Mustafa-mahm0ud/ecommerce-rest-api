@@ -1,10 +1,10 @@
 import { param, body } from "express-validator";
 import mongoose from "mongoose";
 
-import { ALLOWED_PRODUCT_UPDATE_FIELDS } from "../constants/product-fields.js";
-import requireAtLeastOneField from "../require-at-least-one-field.js";
-import requiredOrOptional from "../../helpers/required-or-optional.js";
-import validatorMiddleware from "../../middlewares/validator-middleware.js";
+import { ALLOWED_PRODUCT_UPDATE_FIELDS } from "../utils/constants/product-fields.js";
+import requireAtLeastOneField from "../utils/require-at-least-one-field.js";
+import requiredOrOptional from "../helpers/required-or-optional.js";
+import validatorMiddleware from "../middlewares/validator-middleware.js";
 
 const titleValidator = (isRequired = false) =>
   requiredOrOptional("title", isRequired, "You must enter the title")

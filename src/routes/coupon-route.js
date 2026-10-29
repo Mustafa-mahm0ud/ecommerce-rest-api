@@ -2,7 +2,7 @@ import express from "express";
 
 import { protect, allowedTo } from "../middlewares/auth-middleware.js";
 import * as couponController from "../controllers/coupon-controller.js";
-import * as couponValidator from "../utils/validators/coupon-validator.js";
+import * as couponValidator from "../validators/coupon-validator.js";
 import attachCurrentCoupon from "../middlewares/attach-current-coupon.js";
 
 const router = express.Router();
