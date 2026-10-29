@@ -4,18 +4,11 @@ import * as factory from "./crud-service.js";
 import ApiError from "../../utils/api-error.js";
 import writeProcessedFiles from "../storage/local-storage/write-processed-files.js";
 
-export const getById = factory.getById({
-  Model: subCategoryModel,
-  modelName: "SubCategory",
-});
-export const getDoc = factory.getDoc({
-  Model: subCategoryModel,
-  modelName: "SubCategory",
-});
-export const del = factory.del({
-  Model: subCategoryModel,
-  modelName: "SubCategory",
-});
+const crudConfig = { Model: subCategoryModel, modelName: "SubCategory" };
+
+export const getById = factory.getById(crudConfig);
+export const getDoc = factory.getDoc(crudConfig);
+export const del = factory.del(crudConfig);
 
 const assertCategoryExists = async (categoryId) => {
   const categoryExists = await Category.exists({ _id: categoryId });
@@ -57,7 +50,7 @@ export const update = async ({
 }) => {
   await assertCategoryExists(categoryId);
 
-  return factory.update({ Model: subCategoryModel, modelName: "SubCategory" })({
+  return factory.update(crudConfig)({
     subCategoryId,
     allowedFields,
     processedImage,

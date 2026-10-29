@@ -1,24 +1,11 @@
 import brandModel from "../../models/brand-model.js";
 import * as factory from "./crud-service.js";
 
-export const getById = factory.getById({
-  Model: brandModel,
-  modelName: "Brand",
-});
-export const getDocs = factory.getDocs({
-  Model: brandModel,
-  defaultFields: "name image slug",
-});
-export const getDoc = factory.getDoc({
-  Model: brandModel,
-  modelName: "Brand",
-});
-export const create = factory.create({
-  Model: brandModel,
-  modelName: "Brand",
-});
-export const update = factory.update({
-  Model: brandModel,
-  modelName: "Brand",
-});
-export const del = factory.del({ Model: brandModel, modelName: "Brand" });
+const crudConfig = { Model: brandModel, modelName: "Brand" };
+
+export const getById = factory.getById(crudConfig);
+export const getDocs = factory.getDocs(crudConfig);
+export const getDoc = factory.getDoc(crudConfig);
+export const create = factory.create(crudConfig);
+export const update = factory.update(crudConfig);
+export const del = factory.del(crudConfig);

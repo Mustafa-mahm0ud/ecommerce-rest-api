@@ -4,16 +4,18 @@ import userModel from "../../models/user-model.js";
 import * as factory from "./crud-service.js";
 import ApiError from "../../utils/api-error.js";
 
+const crudConfig = { Model: userModel, modelName: "User" };
+
 export const getDocs = factory.getDocs({
   Model: userModel,
   defaultFields:
     "firstName lastName email phone role active profileImage createdAt",
 });
-export const getDoc = factory.getDoc({ Model: userModel, modelName: "User" });
-export const del = factory.del({ Model: userModel, modelName: "User" });
-export const getById = factory.getById({ Model: userModel, modelName: "User" });
-export const create = factory.create({ Model: userModel, modelName: "User" });
-export const update = factory.update({ Model: userModel, modelName: "User" });
+export const getDoc = factory.getDoc(crudConfig);
+export const del = factory.del(crudConfig);
+export const getById = factory.getById(crudConfig);
+export const create = factory.create(crudConfig);
+export const update = factory.update(crudConfig);
 
 export const updateRole = async ({ id, role }) => {
   const doc = await userModel.findOneAndUpdate(

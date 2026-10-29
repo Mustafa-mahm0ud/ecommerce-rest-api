@@ -3,20 +3,16 @@ import ApiError from "../../utils/api-error.js";
 
 import * as factory from "./crud-service.js";
 
+const crudConfig = { Model: couponModel, modelName: "Coupon" };
+
 export const getDocs = factory.getDocs({
   Model: couponModel,
   defaultFields:
     "code discountType discountValue maxDiscount startDate minOrderValue maxUses expire isActive",
 });
-export const getDoc = factory.getDoc({
-  Model: couponModel,
-  modelName: "Coupon",
-});
-export const create = factory.create({
-  Model: couponModel,
-  modelName: "Coupon",
-});
-export const del = factory.del({ Model: couponModel, modelName: "Coupon" });
+export const getDoc = factory.getDoc(crudConfig);
+export const create = factory.create(crudConfig);
+export const del = factory.del(crudConfig);
 
 export const update = async ({ id, fieldsToUpdate }) => {
   const coupon = await couponModel.findById(id);
