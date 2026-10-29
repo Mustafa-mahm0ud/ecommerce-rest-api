@@ -6,7 +6,6 @@ import * as localUploadMiddleware from "../middlewares/local-upload-middleware.j
 import * as productController from "../controllers/product-controller.js";
 import * as productValidator from "../utils/validators/product-validator.js";
 import { nestedReviewRouter } from "./review-route.js";
-import attachCurrentProduct from "../middlewares/attach-current-product.js";
 import variantRouter from "./variant-route.js";
 import parseVariants from "../middlewares/parse-variants-middleware.js";
 
@@ -38,7 +37,7 @@ router.use("/:productId/variants", variantRouter);
 router.get("/", productController.getProducts);
 
 router.get(
-  "/:id",
+  "/:productId",
   productValidator.getProductValidator,
   productController.getProduct,
 );
@@ -65,7 +64,6 @@ router
     uploadCoverImage,
     productValidator.updateProductValidator,
     resizeCoverImage,
-    attachCurrentProduct,
     productController.updateProduct,
   )
   .delete(
@@ -74,7 +72,7 @@ router
   );
 
 router.post(
-  "/:id/images",
+  "/:productId/images",
   uploadGalleryImages,
   productValidator.addProductImagesValidator,
   resizeGalleryImages,
@@ -82,7 +80,7 @@ router.post(
 );
 
 router.delete(
-  "/:id/images/:imageName",
+  "/:productId/images/:imageName",
   productValidator.deleteProductImageValidator,
   productController.deleteProductImage,
 );

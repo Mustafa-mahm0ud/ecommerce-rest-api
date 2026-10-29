@@ -34,7 +34,6 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       min: 0,
       max: 100,
-      default: 0,
     },
     priceAfterDiscount: {
       type: Number,
@@ -108,6 +107,8 @@ const ProductSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    optimisticConcurrency: true,
+
     toJSON: {
       virtuals: true,
       transform(doc, ret) {
@@ -128,6 +129,18 @@ ProductSchema.index({ brand: 1 });
 ProductSchema.index({ category: 1, price: 1 });
 ProductSchema.index({ category: 1, createdAt: -1 });
 ProductSchema.index({ category: 1, avgRatings: -1 });
+
+ProductSchema.pre("validate", function () {
+  if (this.isModified("price") || this.isModified("discountPercentage")) {
+    if (this.discountPercentage) {
+      this.priceAfterDiscount =
+        Math.round(this.price * (100 - this.discountPercentage)) / 100;
+    } else {
+      this.discountPercentage = undefined;
+      this.priceAfterDiscount = undefined;
+    }
+  }
+});
 
 ProductSchema.pre("findOneAndDelete", async function () {
   const reviewModel = mongoose.model("Review");

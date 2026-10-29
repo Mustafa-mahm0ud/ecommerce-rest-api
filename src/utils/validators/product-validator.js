@@ -32,11 +32,11 @@ const priceValidator = (isRequired = false) =>
     .withMessage("Price must be between 0.01 and 1,000,000")
     .toFloat();
 
-const discountPercentageValidator = () =>
+const discountPercentageValidator = ({ min, msg }) =>
   body("discountPercentage")
     .optional()
-    .isInt({ min: 0, max: 100 })
-    .withMessage("Discount percentage must be between 0 and 100")
+    .isInt({ min, max: 100 })
+    .withMessage(msg)
     .toInt();
 
 const variantValidator = () => [
@@ -122,7 +122,10 @@ export const createProductValidator = [
   descriptionValidator(true),
   quantityValidator(true),
   priceValidator(true),
-  discountPercentageValidator(),
+  discountPercentageValidator({
+    min: 1,
+    msg: "Discount percentage must be between 1 and 100",
+  }),
   ...variantValidator(),
   imagesValidator(),
   categoryValidator(true),
@@ -151,7 +154,10 @@ export const updateProductValidator = [
   descriptionValidator(),
   quantityValidator(),
   priceValidator(),
-  discountPercentageValidator(),
+  discountPercentageValidator({
+    min: 0,
+    msg: "Discount percentage must be between 0 and 100",
+  }),
   categoryValidator(),
   subCategoriesValidator(),
   brandValidator(),

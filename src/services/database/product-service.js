@@ -1,63 +1,54 @@
 import productModel from "../../models/product-model.js";
 import categoryModel from "../../models/category-model.js";
 import subcategoryModel from "../../models/subcategory-model.js";
-import calculatePriceAfterDiscount from "../../helpers/product-calculations.js";
 import writeProcessedFiles from "../storage/local-storage/write-processed-files.js";
 import * as factory from "./crud-service.js";
 import ApiFeatures from "../../utils/api-features.js";
 import ApiError from "../../utils/api-error.js";
 
-export const getById = factory.getById({
-  Model: productModel,
-  modelName: "Product",
-});
-export const hardDelete = factory.del({
-  Model: productModel,
-  modelName: "Product",
-});
-export const addImage = factory.addImage({
-  Model: productModel,
-  modelName: "Product",
-});
-export const deleteImage = factory.deleteImage({
-  Model: productModel,
-  modelName: "Product",
-});
+const crudConfig = { Model: productModel, modelName: "Product" };
 
-export const validateProductData = async ({
+export const getById = factory.getById(crudConfig);
+export const hardDelete = factory.del(crudConfig);
+export const addImage = factory.addImage(crudConfig);
+export const deleteImage = factory.deleteImage(crudConfig);
+
+export const validateProductRelations = async ({
   category,
   subCategoriesIds,
   currentProduct,
 }) => {
   if (category) {
     const categoryExist = await categoryModel.exists({ _id: category });
-    if (!categoryExist) {
-      throw new ApiError(`Category not found`, 404);
-    }
+    if (!categoryExist) throw new ApiError("Category not found", 404);
   }
 
-  if (subCategoriesIds?.length > 0) {
-    const uniqueIds = [...new Set(subCategoriesIds)];
+  const targetCategory = category || currentProduct?.category;
+  const categoryChanged =
+    category && String(category) !== String(currentProduct?.category);
 
-    const targetCategory = category || currentProduct?.category;
+  const idsToCheck =
+    subCategoriesIds ??
+    (categoryChanged ? currentProduct?.subCategories : undefined);
 
-    if (!targetCategory) {
-      throw new ApiError("Product must belong to a parent category", 400);
-    }
+  if (!idsToCheck?.length) return;
 
-    const count = await subcategoryModel.countDocuments({
-      _id: {
-        $in: uniqueIds,
-      },
-      category: targetCategory,
-    });
+  if (!targetCategory) {
+    throw new ApiError("Product must belong to a parent category", 400);
+  }
 
-    if (count !== subCategoriesIds.length) {
-      throw new ApiError(
-        `Some subCategories don't exist or don't belong to product category`,
-        400,
-      );
-    }
+  const uniqueIds = [...new Set(idsToCheck.map(String))];
+
+  const count = await subcategoryModel.countDocuments({
+    _id: { $in: uniqueIds },
+    category: targetCategory,
+  });
+
+  if (count !== uniqueIds.length) {
+    throw new ApiError(
+      "Some subCategories don't exist or don't belong to product category",
+      400,
+    );
   }
 };
 
@@ -109,87 +100,46 @@ export const create = async ({
   processedImage,
   processedImages,
 }) => {
-  const { category, subCategories, price, discountPercentage } = fieldsToCreate;
+  const { category, subCategories } = fieldsToCreate;
 
-  await validateProductData({ category, subCategories });
+  await validateProductRelations({ category, subCategoriesIds: subCategories });
 
-  fieldsToCreate.priceAfterDiscount = calculatePriceAfterDiscount(
-    price,
-    discountPercentage,
-  );
-
-  if (fieldsToCreate.priceAfterDiscount === undefined)
-    delete fieldsToCreate.priceAfterDiscount;
-
-  return factory.create(productModel)(
+  return factory.create({ Model: productModel })({
     fieldsToCreate,
     processedImage,
     processedImages,
-  );
+  });
 };
 
-export const update = async ({
-  productId,
-  fieldsToUpdate,
-  currentProduct,
-  processedImage,
-}) => {
-  const { category, subCategories, price, discountPercentage } = fieldsToUpdate;
+export const update = async ({ productId, fieldsToUpdate, processedImage }) => {
+  const product = await productModel.findOne({
+    _id: productId,
+    isDeleted: false,
+  });
 
-  const updateQuery = { $set: fieldsToUpdate };
+  if (!product) throw new ApiError("Product not found", 404);
 
-  await validateProductData({ category, subCategories, currentProduct });
+  const { category, subCategories } = fieldsToUpdate;
 
-  if (price !== undefined || discountPercentage !== undefined) {
-    if (!currentProduct) {
-      console.error("Current product data is required to update pricing");
+  await validateProductRelations({
+    category,
+    subCategoriesIds: subCategories,
+    currentProduct: product,
+  });
 
-      throw new ApiError(
-        "Something went wrong on our side. Please try again later",
-        500,
-      );
-    }
-
-    const productPrice = price || currentProduct.price;
-    const productDiscountPercentage =
-      discountPercentage ?? currentProduct.discountPercentage;
-
-    const newPriceAfterDiscount = calculatePriceAfterDiscount(
-      productPrice,
-      productDiscountPercentage,
-    );
-
-    if (
-      newPriceAfterDiscount === undefined &&
-      productDiscountPercentage !== undefined
-    ) {
-      delete fieldsToUpdate.priceAfterDiscount;
-      updateQuery.$unset = { priceAfterDiscount: "" };
-    } else {
-      fieldsToUpdate.priceAfterDiscount = newPriceAfterDiscount;
-    }
-  }
-
-  const doc = await productModel.findOneAndUpdate(
-    { _id: productId, isDeleted: false },
-    updateQuery,
-    {
-      returnDocument: "after",
-      runValidators: true,
-    },
-  );
-
-  if (!doc) throw new ApiError(`Product not found`, 404);
+  product.set(fieldsToUpdate);
 
   if (processedImage) await writeProcessedFiles([processedImage]);
 
-  return doc;
+  await product.save();
+
+  return product;
 };
 
 export const del = async ({ productId }) => {
-  const product = await productModel.updateOne(
+  const result = await productModel.updateOne(
     { _id: productId, isDeleted: false },
     { isDeleted: true, deletedAt: new Date() },
   );
-  if (!product.matchedCount) throw new ApiError("Product not found", 404);
+  if (!result.matchedCount) throw new ApiError("Product not found", 404);
 };
